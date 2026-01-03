@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.skypro.homework.dto.users.NewPassword;
 import ru.skypro.homework.dto.users.UpdateUser;
 import ru.skypro.homework.dto.users.User;
+import ru.skypro.homework.support.UserTestData;
 
 import javax.validation.Valid;
 
@@ -36,9 +37,7 @@ public class UsersController {
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content())
             }
     )
-    //public ResponseEntity<Void> setPassword(@Valid @RequestBody NewPassword newPassword) {
     public void setPassword(@Valid @RequestBody NewPassword newPassword) {
-
     }
 
     @GetMapping("/users/me")
@@ -54,10 +53,8 @@ public class UsersController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
             }
     )
-    //public ResponseEntity<User> getUser(Authentication authentication) {
     public User getUser(Authentication authentication) {
-        User user = new User();
-        return user;
+        return UserTestData.createFullUser();
     }
 
     @PatchMapping("/users/me")
@@ -73,17 +70,15 @@ public class UsersController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
             }
     )
-    //public UResponseEntity<UpdateUser> updateUser(@Valid @RequestBody(required = false) UpdateUser updateUser) {
     public UpdateUser updateUser(@Valid @RequestBody(required = false) UpdateUser updateUser) {
         if (updateUser == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        UpdateUser fakeUser = new UpdateUser();
-        fakeUser.setFirstName(updateUser.getFirstName());
-        fakeUser.setLastName(updateUser.getLastName());
-        fakeUser.setPhone(updateUser.getPhone());
-
-        return fakeUser;
+        UpdateUser user = UserTestData.createEmptyUpdateUser();
+        user.setFirstName(updateUser.getFirstName());
+        user.setLastName(updateUser.getLastName());
+        user.setPhone(updateUser.getPhone());
+        return user;
     }
 
     @PatchMapping(value = "/users/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -94,7 +89,6 @@ public class UsersController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
             }
     )
-    //public ResponseEntity<Void> updateUserImage(@RequestPart("image") MultipartFile image) {
     public void updateUserImage(@RequestPart("image") MultipartFile image) {
     }
 }

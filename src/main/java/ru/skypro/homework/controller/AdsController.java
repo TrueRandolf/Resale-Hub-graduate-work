@@ -20,10 +20,10 @@ import ru.skypro.homework.dto.ads.Ad;
 import ru.skypro.homework.dto.ads.Ads;
 import ru.skypro.homework.dto.ads.CreateOrUpdateAd;
 import ru.skypro.homework.dto.ads.ExtendedAd;
+import ru.skypro.homework.support.AdsTestData;
 
 import javax.validation.Valid;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -46,9 +46,8 @@ public class AdsController {
                     )
             }
     )
-    //public ResponseEntity<Ads> getAllAds() {
-    public List<Ads> getAllAds() {
-        return new LinkedList<>();
+    public Ads getAllAds() {
+        return AdsTestData.createFullAds();
     }
 
     @PostMapping(value = "/ads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -61,18 +60,19 @@ public class AdsController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
             }
     )
-    //public ResponseEntity<Ad> addAd(
     public Ad addAd(
             @RequestPart("properties")
-            @Parameter(schema = @Schema(type = "object", description = ""))
+            @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            //@Parameter(schema = @Schema(type = "object", description = ""))
+            //@io.swagger.v3.oas.annotations.Parameter(content = @io.swagger.v3.oas.annotations.media.Content(mediaType = org.springframework.http.MediaType.APPLICATION_JSON_VALUE))
             @Valid CreateOrUpdateAd properties,
             @RequestPart("image") MultipartFile image,
             Authentication authentication) {
         if (properties == null || image == null || image.getOriginalFilename().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        Ad ad = new Ad();
-        ad.setPk(100);
+        Ad ad = AdsTestData.createEmptyAd();
+        ad.setPk(500);
         ad.setTitle(properties.getTitle());
         ad.setPrice(properties.getPrice());
         ad.setImage(image.getOriginalFilename());
@@ -93,10 +93,9 @@ public class AdsController {
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),
             }
     )
-    //public ResponseEntity<ExtendedAd> getAds(@PathVariable Integer id) {
     public ExtendedAd getAds(@PathVariable Integer id) {
 
-        return new ExtendedAd();
+        return AdsTestData.createFullExtendedAd();
     }
 
     @DeleteMapping("/ads/{id}")
@@ -110,7 +109,6 @@ public class AdsController {
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),
             }
     )
-    //public ResponseEntity<Void> removeAd(@PathVariable Integer id) {
     public void removeAd(@PathVariable Integer id) {
     }
 
@@ -132,18 +130,16 @@ public class AdsController {
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),
             }
     )
-    //public ResponseEntity<CreateOrUpdateAd> updateAds(
     public Ad updateAds(
             @PathVariable Integer id,
             @RequestBody(required = false) CreateOrUpdateAd update) {
-            if(update == null){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-            }
-        Ad updateAd = new Ad();
-            updateAd.setPk(id);
-            updateAd.setTitle(update.getTitle());
-            updateAd.setTitle(update.getTitle());
-            updateAd.setPrice(update.getPrice());
+        if (update == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        Ad updateAd = AdsTestData.createFullAd();
+        updateAd.setPk(id);
+        updateAd.setTitle(update.getTitle());
+        updateAd.setPrice(update.getPrice());
 
         return updateAd;
     }
@@ -164,15 +160,14 @@ public class AdsController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
             }
     )
-    //public ResponseEntity<Ads> getAdsMe(Authentication authentication) {
-    public Ads getAdsMe(Authentication authentication){
-        Ads ads = new Ads();
-        ads.setCount(10);
+    public Ads getAdsMe(Authentication authentication) {
+        Ads ads = AdsTestData.createFullAds();
         return ads;
     }
 
 
-    @PatchMapping(value = "/ads/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/ads/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Operation(
             summary = "Обновление картинки объявления",
             responses = {
@@ -189,9 +184,20 @@ public class AdsController {
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),
             }
     )
-    public ResponseEntity<byte[]> updateImage(@PathVariable("id") Integer id,
-                                              @RequestPart(value = "image") MultipartFile image) {
-        return ResponseEntity.ok().build();
+    //public ResponseEntity<byte[]> updateImage(@PathVariable("id") Integer id,
+    public byte[] updateImage(@PathVariable("id") Integer id,
+                              @RequestPart(value = "image") MultipartFile image) {
+        if (image.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        byte[] imageData;
+        try {
+            imageData = image.getBytes();
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        //return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(imageData);
+        return imageData;
     }
 
 

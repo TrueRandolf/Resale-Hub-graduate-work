@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.skypro.homework.dto.comments.Comment;
 import ru.skypro.homework.dto.comments.Comments;
 import ru.skypro.homework.dto.comments.CreateOrUpdateComment;
+import ru.skypro.homework.support.CommentsTestData;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -38,10 +39,9 @@ public class CommentsController {
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content())
             }
     )
-    //public ResponseEntity<Comments> getComments(@PathVariable Integer id) {
     public Comments getComments(@PathVariable Integer id) {
 
-        return new Comments();
+        return CommentsTestData.createFullComments();
     }
 
     @PostMapping("/ads/{id}/comments")
@@ -60,7 +60,6 @@ public class CommentsController {
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content())
             }
     )
-    //public ResponseEntity<Comment> addComment(
     public Comment addComment(
             @PathVariable Integer id,
             @RequestBody(required = false) CreateOrUpdateComment updateComment
@@ -68,10 +67,8 @@ public class CommentsController {
         if (updateComment == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        Comment comment = new Comment();
-        comment.setPk(100);
+        Comment comment = CommentsTestData.createFullComment();
         comment.setText(updateComment.getText());
-
         return comment;
     }
 
@@ -83,13 +80,12 @@ public class CommentsController {
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", content = @Content()),
                     //@ApiResponse(responseCode = "200", description = "OK", content = @Content()),
-                    // Что писать-то??? в ТЗ одно, в схеме другое.
+                    // Что писать-то??? в ТЗ одно, в схеме другое, скайпро, короче...
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content()),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content()),
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),
             }
     )
-    //public ResponseEntity<Void> deleteComment(
     public void deleteComment(
             @PathVariable Integer adId,
             @PathVariable Integer commentId) {
@@ -120,11 +116,10 @@ public class CommentsController {
             @PathVariable Integer commentId,
             @RequestBody(required = false) CreateOrUpdateComment commentUpdate
     ) {
-        if(commentUpdate == null){
+        if (commentUpdate == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        Comment comment= new Comment();
-        comment.setPk(100);
+        Comment comment = CommentsTestData.createFullComment();
         comment.setText(commentUpdate.getText());
 
         return comment;
