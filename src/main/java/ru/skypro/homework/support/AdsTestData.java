@@ -23,6 +23,9 @@ public class AdsTestData {
 
     public static final String AD_DESCRIPTION = "Ad description";
 
+    public static final int ANOTHER_AD_ID = 500;
+
+    public static final String IMAGE_TEST_PATH = "test.jpg";
 
     public Ad createEmptyAd() {
         return new Ad();

@@ -16,6 +16,8 @@ import ru.skypro.homework.dto.comments.Comments;
 import ru.skypro.homework.dto.comments.CreateOrUpdateComment;
 import ru.skypro.homework.support.CommentsTestData;
 
+import javax.validation.Valid;
+
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -62,7 +64,7 @@ public class CommentsController {
     )
     public Comment addComment(
             @PathVariable Integer id,
-            @RequestBody(required = false) CreateOrUpdateComment updateComment
+            @Valid @RequestBody(required = false) CreateOrUpdateComment updateComment
     ) {
         if (updateComment == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -109,12 +111,10 @@ public class CommentsController {
             }
     )
     @PatchMapping("/ads/{adId}/comments/{commentId}")
-
-
     public Comment updateComment(
             @PathVariable Integer adId,
             @PathVariable Integer commentId,
-            @RequestBody(required = false) CreateOrUpdateComment commentUpdate
+            @Valid @RequestBody(required = false) CreateOrUpdateComment commentUpdate
     ) {
         if (commentUpdate == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);

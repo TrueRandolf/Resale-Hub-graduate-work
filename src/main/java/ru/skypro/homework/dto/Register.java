@@ -26,7 +26,7 @@ public class Register {
     @Size(min = 2, max = 16)
     private String lastName;
 
-    @Schema(description = "телефон пользователя", pattern = "\\+7\\s?(?\\d{3}\\)?\\s?\\d{3}-?\\d{2}-?\\d{2}")
+    @Schema(description = "телефон пользователя", pattern = "\\+7\\s?\\(?\\d{3}\\)?\\s?\\d{3}-?\\d{2}-?\\d{2}")
     @Pattern(regexp = "\\+7\\s?\\(?\\d{3}\\)?\\s?\\d{3}-?\\d{2}-?\\d{2}")
     private String phone;
 

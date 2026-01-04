@@ -63,16 +63,14 @@ public class AdsController {
     public Ad addAd(
             @RequestPart("properties")
             @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            //@Parameter(schema = @Schema(type = "object", description = ""))
-            //@io.swagger.v3.oas.annotations.Parameter(content = @io.swagger.v3.oas.annotations.media.Content(mediaType = org.springframework.http.MediaType.APPLICATION_JSON_VALUE))
             @Valid CreateOrUpdateAd properties,
             @RequestPart("image") MultipartFile image,
             Authentication authentication) {
         if (properties == null || image == null || image.getOriginalFilename().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        Ad ad = AdsTestData.createEmptyAd();
-        ad.setPk(500);
+        Ad ad = AdsTestData.createFullAd();
+        ad.setPk(AdsTestData.ANOTHER_AD_ID);
         ad.setTitle(properties.getTitle());
         ad.setPrice(properties.getPrice());
         ad.setImage(image.getOriginalFilename());
@@ -137,7 +135,6 @@ public class AdsController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         Ad updateAd = AdsTestData.createFullAd();
-        updateAd.setPk(id);
         updateAd.setTitle(update.getTitle());
         updateAd.setPrice(update.getPrice());
 
@@ -184,7 +181,6 @@ public class AdsController {
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),
             }
     )
-    //public ResponseEntity<byte[]> updateImage(@PathVariable("id") Integer id,
     public byte[] updateImage(@PathVariable("id") Integer id,
                               @RequestPart(value = "image") MultipartFile image) {
         if (image.isEmpty()) {
@@ -196,7 +192,6 @@ public class AdsController {
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        //return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(imageData);
         return imageData;
     }
 

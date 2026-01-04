@@ -18,6 +18,8 @@ public class CommentsTestData {
     public static final String COMMENT_TEXT = "Test comment text";
 
     public static final String COMMENT_UPDATE = "Update comment text";
+    public static final String COMMENT_UPDATE_SHORT = "Short";
+    public static final String COMMENT_UPDATE_LONG = "TooMuchManyLongVeryLargeAndNotValidAndRepeatOnceAgainThisNotValid";
 
     public Comment createEmptyComment() {
         return new Comment();
@@ -41,6 +43,18 @@ public class CommentsTestData {
     public CreateOrUpdateComment createFullUpdateComment() {
         CreateOrUpdateComment updateComment = new CreateOrUpdateComment();
         updateComment.setText(COMMENT_UPDATE);
+        return updateComment;
+    }
+
+    public CreateOrUpdateComment createFullUpdateCommentShort() {
+        CreateOrUpdateComment updateComment = new CreateOrUpdateComment();
+        updateComment.setText(COMMENT_UPDATE_SHORT);
+        return updateComment;
+    }
+
+    public CreateOrUpdateComment createFullUpdateCommentLong() {
+        CreateOrUpdateComment updateComment = new CreateOrUpdateComment();
+        updateComment.setText(COMMENT_UPDATE_LONG);
         return updateComment;
     }
 
