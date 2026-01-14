@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6-insert-initial_admin
+      author: TrueRandolf
+      changes:
+        # first create admin in "users" table
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: user_name
+                  value: Admin
+              - column:
+                  name: first_name
+                  value: Admin
+              - column:
+                  name: last_name
+                  value: Admin
+              - column:
+                  name: phone
+                  value: "+79999999999"
+        # then create admin in "auth" table
+        - insert:
+            tableName: auth_data
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 1
+              - column:
+                  name: password_hash
+                  value: "$2a$12$jwIhy5Fvn0tD5g.etdr4mOT0Q7Rt0IVvokxiROduut5LMnX5TsezW"
+              - column:
+                  name: role
+                  value: "ADMIN"
+
+
+
+

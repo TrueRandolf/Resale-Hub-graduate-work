@@ -9,19 +9,23 @@ spring:
     password: ShowMeTheMoney511
     driver-class-name: org.postgresql.Driver
 
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
   # Jpa settings
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update  # BEWARE THE JABBERWOCK MY SON!
+      ddl-auto: validate  # BEWARE THE JABBERWOCK MY SON!
     properties:
       hibernate:
         format_sql: true
         use_sql_comments: true
 
-  # liquibase
-  liquibase:
-    enabled: false
+
+
+
 
 # server port, run by default
 server:

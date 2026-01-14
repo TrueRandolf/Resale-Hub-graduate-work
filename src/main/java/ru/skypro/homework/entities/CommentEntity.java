@@ -7,7 +7,6 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 
 @Entity
-//@Table(name = "comments")
 @Table(name = "comments", indexes = {
         @Index(name = "idx_comments_ad_id", columnList = "ad_id"),
         @Index(name = "idx_comments_user_id", columnList = "user_id")

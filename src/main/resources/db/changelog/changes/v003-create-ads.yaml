@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3-create-ads
+      author: TrueRandolf
+      changes:
+        - createTable:
+            tableName: ads
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_ads_user
+                    referencedTableName: users
+                    referencedColumnNames: id
+                    deleteCascade: true
+              - column:
+                  name: price
+                  type: integer
+                  constraints:
+                    nullable: false
+                    checkConstraint: "price >=0"
+              - column:
+                  name: ad_image
+                  type: varchar(255)
+              - column:
+                  name: title
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+
+
+

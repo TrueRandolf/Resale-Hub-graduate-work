@@ -29,7 +29,7 @@ public class UserEntity {
     @Column(name = "last_name", length = 16)
     private String lastName;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", nullable = false, length = 20)
     private String phone;
 
     @Column(name = "user_image")

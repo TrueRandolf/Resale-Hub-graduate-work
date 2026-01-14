@@ -8,7 +8,6 @@ import javax.persistence.*;
 import javax.validation.constraints.PositiveOrZero;
 
 @Entity
-//@Table(name = "ads")
 @Table(name = "ads", indexes = {
         @Index(name = "idx_ads_user_id", columnList = "user_id")
 })

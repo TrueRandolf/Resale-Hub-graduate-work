@@ -24,6 +24,7 @@ public class AuthEntity {
     @Column(name = "password_hash", nullable = false, length = 100)
     private String password;
 
+    @Column(name = "role", nullable = false, length = 32)
     @Enumerated(EnumType.STRING)
     private Role role;
 }
