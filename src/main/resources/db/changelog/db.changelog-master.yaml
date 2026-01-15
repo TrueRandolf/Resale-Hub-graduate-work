@@ -9,5 +9,4 @@ databaseChangeLog:
       file: db/changelog/changes/v004-create-comments.yaml
   - include:
       file: db/changelog/changes/v005-create-indexes.yaml
-  - include:
-      file: db/changelog/changes/v006-insert-initial-admin.yaml
+
