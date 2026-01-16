@@ -13,7 +13,7 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
-  # Jpa settings
+  # Hibernate settings
   jpa:
     show-sql: true
     hibernate:
