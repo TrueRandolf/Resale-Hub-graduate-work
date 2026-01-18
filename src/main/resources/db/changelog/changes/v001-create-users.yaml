@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1-create-users
+      author: TrueRandolf
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_name
+                  type: varchar(64)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: timestamp
+              - column:
+                  name: first_name
+                  type: varchar(16)
+              - column:
+                  name: last_name
+                  type: varchar(16)
+              - column:
+                  name: phone
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_image
+                  type: varchar(255)

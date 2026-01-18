@@ -1,0 +1,33 @@
+# SPRING settings
+spring:
+  application:
+    name: resale-service  # application name
+  # DB settings
+  datasource:
+    url: jdbc:postgresql://localhost:5432/resale_db
+    username: resale_owner
+    password: ShowMeTheMoney511
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  # Hibernate settings
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+# server port, run by default
+server:
+  port: 8080
+
+# logger settings
+logging:
+  level:
+    org.hibernate.tool.schema: DEBUG
