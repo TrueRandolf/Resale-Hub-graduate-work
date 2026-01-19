@@ -20,6 +20,7 @@ import ru.skypro.homework.dto.ads.Ad;
 import ru.skypro.homework.dto.ads.Ads;
 import ru.skypro.homework.dto.ads.CreateOrUpdateAd;
 import ru.skypro.homework.dto.ads.ExtendedAd;
+import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.support.AdsTestData;
 
 import javax.validation.Valid;
@@ -31,6 +32,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Tag(name = "Объявления")
 public class AdsController {
+
+    private final AdService adService;
+
+
 
     @GetMapping("/ads")
     @Operation(
@@ -47,7 +52,8 @@ public class AdsController {
             }
     )
     public Ads getAllAds() {
-        return AdsTestData.createFullAds();
+
+        return adService.getAds();
     }
 
     @PostMapping(value = "/ads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -66,16 +72,18 @@ public class AdsController {
             @Valid CreateOrUpdateAd properties,
             @RequestPart("image") MultipartFile image,
             Authentication authentication) {
-        if (properties == null || image == null || image.getOriginalFilename().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-        Ad ad = AdsTestData.createFullAd();
-        ad.setPk(AdsTestData.ANOTHER_AD_ID);
-        ad.setTitle(properties.getTitle());
-        ad.setPrice(properties.getPrice());
-        ad.setImage(image.getOriginalFilename());
 
-        return ad;
+            return adService.adSimpleAd(properties, image);
+//        if (properties == null || image == null || image.getOriginalFilename().isBlank()) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+//        }
+//        Ad ad = AdsTestData.createFullAd();
+//        ad.setPk(AdsTestData.ANOTHER_AD_ID);
+//        ad.setTitle(properties.getTitle());
+//        ad.setPrice(properties.getPrice());
+//        ad.setImage(image.getOriginalFilename());
+//
+//        return ad;
     }
 
     @GetMapping("/ads/{id}")

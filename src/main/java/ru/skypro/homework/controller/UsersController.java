@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.skypro.homework.dto.users.NewPassword;
 import ru.skypro.homework.dto.users.UpdateUser;
 import ru.skypro.homework.dto.users.User;
+import ru.skypro.homework.service.UserService;
 import ru.skypro.homework.support.UserTestData;
 
 import javax.validation.Valid;
@@ -27,6 +28,8 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @Tag(name = "Пользователи")
 public class UsersController {
+
+    private final UserService userService;
 
     @PostMapping("/users/set_password")
     @Operation(
@@ -54,7 +57,9 @@ public class UsersController {
             }
     )
     public User getUser(Authentication authentication) {
-        return UserTestData.createFullUser();
+
+        //return UserTestData.createFullUser();
+        return userService.getAuthUserInfo();
     }
 
     @PatchMapping("/users/me")
@@ -71,14 +76,7 @@ public class UsersController {
             }
     )
     public UpdateUser updateUser(@Valid @RequestBody(required = false) UpdateUser updateUser) {
-        if (updateUser == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-        UpdateUser user = UserTestData.createEmptyUpdateUser();
-        user.setFirstName(updateUser.getFirstName());
-        user.setLastName(updateUser.getLastName());
-        user.setPhone(updateUser.getPhone());
-        return user;
+        return userService.updateAuthUser(updateUser);
     }
 
     @PatchMapping(value = "/users/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -90,5 +88,6 @@ public class UsersController {
             }
     )
     public void updateUserImage(@RequestPart("image") MultipartFile image) {
+        userService.updateAuthUserImage("path");
     }
 }

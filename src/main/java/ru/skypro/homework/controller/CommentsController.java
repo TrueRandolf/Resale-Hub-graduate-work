@@ -8,13 +8,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.skypro.homework.dto.comments.Comment;
 import ru.skypro.homework.dto.comments.Comments;
 import ru.skypro.homework.dto.comments.CreateOrUpdateComment;
-import ru.skypro.homework.support.CommentsTestData;
+import ru.skypro.homework.service.CommentService;
 
 import javax.validation.Valid;
 
@@ -24,6 +23,8 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @Tag(name = "Комментарии")
 public class CommentsController {
+
+    private final CommentService commentService;
 
     @GetMapping("/ads/{id}/comments")
     @Operation(
@@ -42,8 +43,8 @@ public class CommentsController {
             }
     )
     public Comments getComments(@PathVariable Integer id) {
-
-        return CommentsTestData.createFullComments();
+        return commentService.getAllCommentsAd(Long.valueOf(id));
+        //return CommentsTestData.createFullComments();
     }
 
     @PostMapping("/ads/{id}/comments")
@@ -69,9 +70,7 @@ public class CommentsController {
         if (updateComment == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        Comment comment = CommentsTestData.createFullComment();
-        comment.setText(updateComment.getText());
-        return comment;
+        return commentService.addCommentToAd(Long.valueOf(id), updateComment);
     }
 
 
@@ -91,7 +90,7 @@ public class CommentsController {
     public void deleteComment(
             @PathVariable Integer adId,
             @PathVariable Integer commentId) {
-
+        commentService.deleteComment(Long.valueOf(adId), Long.valueOf(commentId));
     }
 
     @Operation(
@@ -116,13 +115,8 @@ public class CommentsController {
             @PathVariable Integer commentId,
             @Valid @RequestBody(required = false) CreateOrUpdateComment commentUpdate
     ) {
-        if (commentUpdate == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-        Comment comment = CommentsTestData.createFullComment();
-        comment.setText(commentUpdate.getText());
 
-        return comment;
+        return commentService.updateComment(Long.valueOf(adId), Long.valueOf(commentId), commentUpdate);
     }
 
 
