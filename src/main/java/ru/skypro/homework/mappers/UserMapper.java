@@ -24,6 +24,9 @@ public interface UserMapper {
 
     void updateUserEntity(UpdateUser dto, @MappingTarget UserEntity entity);
 
+
+    UpdateUser toDtoUpdateUser(UserEntity entity);
+
     @Mapping(target = "userName", source = "username")
     UserEntity toUserEntity(Register register);
 

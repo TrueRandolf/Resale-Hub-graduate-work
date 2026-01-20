@@ -59,7 +59,7 @@ public class UsersController {
     public User getUser(Authentication authentication) {
 
         //return UserTestData.createFullUser();
-        return userService.getAuthUserInfo();
+        return userService.getAuthUserInfo(authentication);
     }
 
     @PatchMapping("/users/me")
@@ -75,8 +75,8 @@ public class UsersController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
             }
     )
-    public UpdateUser updateUser(@Valid @RequestBody(required = false) UpdateUser updateUser) {
-        return userService.updateAuthUser(updateUser);
+    public UpdateUser updateUser(@Valid @RequestBody(required = false) UpdateUser user,Authentication authentication) {
+        return userService.updateAuthUser(user, authentication);
     }
 
     @PatchMapping(value = "/users/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -87,7 +87,7 @@ public class UsersController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
             }
     )
-    public void updateUserImage(@RequestPart("image") MultipartFile image) {
-        userService.updateAuthUserImage("path");
+    public void updateUserImage(@RequestPart("image") MultipartFile image, Authentication authentication) {
+        userService.updateAuthUserImage("path",authentication);
     }
 }

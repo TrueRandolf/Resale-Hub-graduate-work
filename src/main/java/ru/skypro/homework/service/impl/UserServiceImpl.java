@@ -1,49 +1,84 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.dto.users.NewPassword;
 import ru.skypro.homework.dto.users.UpdateUser;
 import ru.skypro.homework.dto.users.User;
+import ru.skypro.homework.entities.AuthEntity;
+import ru.skypro.homework.entities.UserEntity;
+import ru.skypro.homework.mappers.UserMapper;
+import ru.skypro.homework.repository.AuthRepository;
+import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.UserService;
-import ru.skypro.homework.support.UserTestData;
 
 @Slf4j
+@AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
-//    boolean updateUserPassword(NewPassword newPassword);
-//    User getAuthUserInfo();
-//    User updateAuthUser(UpdateUser updateUser);
-//    boolean updateAuthUserImage(String filepath
 
+    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
+    private final PasswordEncoder encoder;
+    private final UserMapper userMapper;
 
-    public boolean updateUserPassword(NewPassword newPassword) {
-        log.info("invoked user service userpassword");
-        return true;
-    }
+    @Transactional
+    public void updateUserPassword(NewPassword newPassword, Authentication authentication) {
+        log.info("invoked user service user password");
 
-    public User getAuthUserInfo() {
-        log.info("invoked user service getinfo");
-        return UserTestData.createFullUser();
-    }
+        System.out.println("newPassword.getCurrentPassword() = " + newPassword.getCurrentPassword());
+        System.out.println("newPassword.getNewPassword() = " + newPassword.getNewPassword());
 
+        String login = authentication.getName();
 
-    public UpdateUser updateAuthUser(UpdateUser updateUser) {
-        log.info("invoked user service update");
-        if (updateUser == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        AuthEntity authEntity = authRepository.findByUser_UserName(login)
+                .orElseThrow(() -> new UsernameNotFoundException("user not found"));
+
+        if (!encoder.matches(newPassword.getCurrentPassword(), authEntity.getPassword())) {
+            throw new IllegalArgumentException("wrong password");
         }
-        UpdateUser user = UserTestData.createEmptyUpdateUser();
-        user.setFirstName(updateUser.getFirstName());
-        user.setLastName(updateUser.getLastName());
-        user.setPhone(updateUser.getPhone());
 
-        return user;
+        authEntity.setPassword(encoder.encode(newPassword.getNewPassword()));
+        authRepository.save(authEntity);
+
     }
 
-    public boolean updateAuthUserImage(String filepath) {
+    @Transactional(readOnly = true)
+    public User getAuthUserInfo(Authentication authentication) {
+        log.info("invoked user service get info");
+
+        String login = authentication.getName();
+        log.info("user login: {}", login);
+
+        UserEntity userEntity = userRepository.findByUserName(login)
+                .orElseThrow(() -> new UsernameNotFoundException("user not found"));
+        AuthEntity authEntity = authRepository.findByUser_UserName(login)
+                .orElseThrow(() -> new UsernameNotFoundException("auth not found"));
+
+        return userMapper.toUserDto(userEntity, authEntity);
+    }
+
+
+    @Transactional
+    public UpdateUser updateAuthUser(UpdateUser updateUser, Authentication authentication) {
+        log.info("invoked user service update");
+
+        UserEntity userEntity = userRepository.findByUserName(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("user not found"));
+
+        userMapper.updateUserEntity(updateUser, userEntity);
+        userRepository.save(userEntity);
+
+        return userMapper.toDtoUpdateUser(userEntity);
+    }
+
+
+    public boolean updateAuthUserImage(String filepath, Authentication authentication) {
         log.info("invoked user service update image");
         return true;
     }
