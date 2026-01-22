@@ -4,5 +4,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ImageService {
     void deleteImage(String filePath);
-    String saveImage(MultipartFile file);
+
+    String saveAdImage(MultipartFile file, Long userId);
+
+    String saveAvatarImage(MultipartFile file, Long userId);
 }

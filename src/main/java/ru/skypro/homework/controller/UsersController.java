@@ -39,22 +39,22 @@ public class UsersController {
     public void setPassword(@Valid @RequestBody NewPassword newPassword) {
     }
 
-    @GetMapping("/users/me")
-    @Operation(
-            summary = "Получение информации об авторизованном пользователе",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "OK",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = User.class))),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
-            }
-    )
-    public User getUser(Authentication authentication) {
-        return userService.getAuthUserInfo(authentication);
-    }
+        @GetMapping("/users/me")
+        @Operation(
+                summary = "Получение информации об авторизованном пользователе",
+                responses = {
+                        @ApiResponse(
+                                responseCode = "200",
+                                description = "OK",
+                                content = @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = User.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
+                }
+        )
+        public User getUser(Authentication authentication) {
+            return userService.getAuthUserInfo(authentication);
+        }
 
     @PatchMapping("/users/me")
     @Operation(

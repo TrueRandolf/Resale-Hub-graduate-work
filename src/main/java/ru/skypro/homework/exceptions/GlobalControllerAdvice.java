@@ -83,6 +83,15 @@ public class GlobalControllerAdvice {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+/*
+@ExceptionHandler(MaxUploadSizeExceededException.class)
+public ResponseEntity<String> handleMaxSizeException(MaxUploadSizeExceededException e) {
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body("Загружаемый файл слишком велик! Максимальный размер: 10 МБ.");
+}
+* */
+
 
 }
 
