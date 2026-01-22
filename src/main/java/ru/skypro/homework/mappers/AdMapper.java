@@ -22,6 +22,11 @@ public interface AdMapper {
     @Mapping(target = "pk", source = "id")
     Ad toAdDto(AdEntity adEntity);
 
+    default String mapImage(String adImage) {
+        if (adImage == null) return null;
+        return "/images/" + adImage;
+    }
+
     List<Ad> toAdList(List<AdEntity> adEntityList);
 
     default Ads toAds(List<AdEntity> adEntityList) {
