@@ -11,9 +11,7 @@ import ru.skypro.homework.dto.comments.CreateOrUpdateComment;
 import ru.skypro.homework.entities.AdEntity;
 import ru.skypro.homework.entities.CommentEntity;
 import ru.skypro.homework.entities.UserEntity;
-import ru.skypro.homework.exceptions.ForbiddenException;
 import ru.skypro.homework.exceptions.NotFoundException;
-import ru.skypro.homework.exceptions.UnauthorizedException;
 import ru.skypro.homework.mappers.CommentMapper;
 import ru.skypro.homework.repository.AdsRepository;
 import ru.skypro.homework.repository.CommentRepository;
@@ -37,12 +35,10 @@ public class CommentServiceImpl implements CommentService {
     public Comments getAllCommentsAd(Long adId, Authentication authentication) {
         log.info("invoked comment service get all comments");
 
+        accessService.checkAuth(authentication);
+
         AdEntity adEntity = adsRepository.findById(adId)
                 .orElseThrow(() -> new NotFoundException("Ad not found"));
-
-        if (!accessService.isOwner(adEntity.getUser().getUserName(), authentication)) {
-            throw new ForbiddenException("Access denied");
-        }
 
         return commentMapper.toComments(commentRepository.findByAd_Id(adId));
     }
@@ -51,12 +47,10 @@ public class CommentServiceImpl implements CommentService {
     public Comment addCommentToAd(Long adId, CreateOrUpdateComment updateComment, Authentication authentication) {
         log.info("invoked comment service add comment");
 
+        accessService.checkAuth(authentication);
+
         AdEntity adEntity = adsRepository.findById(adId)
                 .orElseThrow(() -> new NotFoundException("Ad not found"));
-
-        if (!accessService.isOwner(adEntity.getUser().getUserName(), authentication)) {
-            throw new ForbiddenException("Access denied");
-        }
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -73,6 +67,9 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void deleteComment(Long adId, Long commentId, Authentication authentication) {
         log.info("invoked comment service delete comment");
+
+        accessService.checkAuth(authentication);
+
         CommentEntity commentEntity = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comment not found"));
 
@@ -80,13 +77,12 @@ public class CommentServiceImpl implements CommentService {
             throw new NotFoundException("Ad not found");
         }
 
-        if (!accessService.isOwner(commentEntity.getUser().getUserName(), authentication)) {
-            throw new UnauthorizedException("Access denied");
-        }
-
         if (!commentEntity.getAd().getId().equals(adId)) {
             throw new NotFoundException("Wrong relation ad->comment");
         }
+
+        accessService.checkEdit(authentication, commentEntity.getUser().getUserName());
+
         commentRepository.delete(commentEntity);
     }
 
@@ -94,6 +90,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public Comment updateComment(Long adId, Long commentId, CreateOrUpdateComment updateComment, Authentication authentication) {
         log.info("invoked comment service update comment");
+
+        accessService.checkAuth(authentication);
 
         AdEntity adEntity = adsRepository.findById(adId)
                 .orElseThrow(() -> new NotFoundException("Not found ad"));
@@ -105,14 +103,11 @@ public class CommentServiceImpl implements CommentService {
             throw new NotFoundException("Wrong relation ad->comment");
         }
 
-        if (!accessService.isOwner(commentEntity.getUser().getUserName(), authentication)) {
-            throw new UnauthorizedException("Access denied");
-        }
+        accessService.checkEdit(authentication, commentEntity.getUser().getUserName());
 
         commentMapper.updateCommentEntity(updateComment, commentEntity);
         commentRepository.save(commentEntity);
         return commentMapper.toCommentDto(commentEntity);
     }
-
 
 }

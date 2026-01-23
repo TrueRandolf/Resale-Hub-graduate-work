@@ -2,18 +2,39 @@ package ru.skypro.homework.security;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.Role;
+import ru.skypro.homework.exceptions.ForbiddenException;
+import ru.skypro.homework.exceptions.UnauthorizedException;
 
 @Slf4j
 @AllArgsConstructor
 @Service
 public class AccessServiceImpl implements AccessService {
 
-    @Override
-    public boolean isOwner(String username, Authentication authentication) {
-        return authentication.getName().equals(username) || isAdmin(authentication);
+    public void checkAuth(Authentication authentication) {
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                authentication instanceof AnonymousAuthenticationToken
+        ) {
+            throw new UnauthorizedException("Access denied");
+        }
+    }
+
+    public void checkEdit(Authentication authentication, String username) {
+        checkAuth(authentication);
+        if (!(authentication.getName().equals(username) || isAdmin(authentication))) {
+            throw new ForbiddenException("Access denied");
+        }
+    }
+
+    public void checkAdmin(Authentication authentication){
+        if(!isAdmin(authentication)){
+            log.warn("Trying non-admin access to admin-only operation! {}", authentication.getName());
+            throw new ForbiddenException("Only Admin access!");
+        }
     }
 
     private boolean isAdmin(Authentication authentication) {

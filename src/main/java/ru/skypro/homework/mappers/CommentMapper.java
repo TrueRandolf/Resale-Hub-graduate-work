@@ -1,24 +1,45 @@
 package ru.skypro.homework.mappers;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import ru.skypro.homework.dto.comments.Comment;
 import ru.skypro.homework.dto.comments.Comments;
 import ru.skypro.homework.dto.comments.CreateOrUpdateComment;
 import ru.skypro.homework.entities.CommentEntity;
+import ru.skypro.homework.entities.UserEntity;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentMapper {
+//
+//    @Mapping(target = "author", source = "user.id")
+//    @Mapping(target = "authorImage", source = "user.userImage")
+//    @Mapping(target = "authorFirstname", source = "user.firstName")
+//    @Mapping(target = "pk", source = "id")
+//    Comment toCommentDto(CommentEntity comment);
 
     @Mapping(target = "author", source = "user.id")
-    @Mapping(target = "authorImage", source = "user.userImage")
-    @Mapping(target = "authorFirstname", source = "user.firstName")
+    @Mapping(target = "authorImage", source = "user", qualifiedByName = "mapAvatar")
+    @Mapping(target = "authorFirstname", source = "user", qualifiedByName = "mapName")
     @Mapping(target = "pk", source = "id")
     Comment toCommentDto(CommentEntity comment);
+
+    @Named("mapName")
+    default String mapName(UserEntity user) {
+        if (user.getDeletedAt() != null) {
+            return "deleted user";
+        }
+        return user.getFirstName();
+    }
+
+    @Named("mapAvatar")
+    default String mapAvatar(UserEntity user) {
+        if (user.getDeletedAt() != null) {
+            return null;
+        }
+        return user.getUserImage();
+    }
+
 
     List<Comment> toCommentList(List<CommentEntity> commentEntities);
 

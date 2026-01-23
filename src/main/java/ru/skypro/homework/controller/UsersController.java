@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -84,4 +85,22 @@ public class UsersController {
         public void updateUserImage(@RequestPart("image") MultipartFile image, Authentication authentication) {
             userService.updateAuthUserImage(image, authentication);
         }
+
+
+
+    @DeleteMapping("/user/me/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    @Operation(
+//            summary = "Удаление объявления",
+//            responses = {
+//                    @ApiResponse(responseCode = "204", description = "No Content", content = @Content()),
+//                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content()),
+//                    @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content()),
+//                    @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),
+//            }
+//    )
+    public void removeUser(@PathVariable Integer id, Authentication authentication) {
+        userService.softDeleteUser(Long.valueOf(id), authentication);
+    }
+
 }

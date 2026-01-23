@@ -46,9 +46,8 @@ public class AdsController {
                     )
             }
     )
-    public Ads getAllAds() {
-
-        return adService.getAds();
+    public Ads getAllAds(Authentication authentication) {
+        return adService.getAds(authentication);
     }
 
     @PostMapping(value = "/ads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

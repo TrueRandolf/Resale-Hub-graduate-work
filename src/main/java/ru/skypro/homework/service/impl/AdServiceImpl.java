@@ -12,7 +12,6 @@ import ru.skypro.homework.dto.ads.CreateOrUpdateAd;
 import ru.skypro.homework.dto.ads.ExtendedAd;
 import ru.skypro.homework.entities.AdEntity;
 import ru.skypro.homework.entities.UserEntity;
-import ru.skypro.homework.exceptions.ForbiddenException;
 import ru.skypro.homework.exceptions.NotFoundException;
 import ru.skypro.homework.mappers.AdMapper;
 import ru.skypro.homework.repository.AdsRepository;
@@ -23,6 +22,9 @@ import ru.skypro.homework.service.ImageService;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Slf4j
@@ -37,14 +39,17 @@ public class AdServiceImpl implements AdService {
 
 
     @Transactional(readOnly = true)
-    public Ads getAds() {
+    public Ads getAds(Authentication authentication) {
         log.info("invoked ad service getAllAds");
+        accessService.checkAuth(authentication);
         return mapper.toAds(adsRepository.findAll());
     }
 
     @Transactional
     public Ad addSimpleAd(CreateOrUpdateAd createOrUpdateAd, MultipartFile image, Authentication authentication) {
         log.info("invoked ad service add ad");
+
+        accessService.checkAuth(authentication);
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
                 .orElseThrow(() -> new NotFoundException("User not found"));
@@ -64,13 +69,10 @@ public class AdServiceImpl implements AdService {
     public ExtendedAd getAdInfo(Long id, Authentication authentication) {
         log.info("invoked ad service get ad info");
 
+        accessService.checkAuth(authentication);
+
         AdEntity adEntity = adsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Ad not found"));
-
-        if (!accessService.isOwner(adEntity.getUser().getUserName(), authentication)) {
-            throw new ForbiddenException("Access denied");
-        }
-
         return mapper.toExtendedAd(adEntity);
     }
 
@@ -78,12 +80,13 @@ public class AdServiceImpl implements AdService {
     @Transactional
     public void deleteSimpleAd(Long id, Authentication authentication) {
         log.info("invoked ad service delete ad");
+
+        accessService.checkAuth(authentication);
         AdEntity adEntity = adsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Ad not found"));
 
-        if (!accessService.isOwner(adEntity.getUser().getUserName(), authentication)) {
-            throw new ForbiddenException("Access denied");
-        }
+        accessService.checkEdit(authentication, adEntity.getUser().getUserName());
+
         String filePath = adEntity.getAdImage();
         adsRepository.deleteById(id);
         if (filePath != null) imageService.deleteImage(filePath);
@@ -93,12 +96,13 @@ public class AdServiceImpl implements AdService {
     @Transactional
     public Ad updateSingleAd(Long id, CreateOrUpdateAd ad, Authentication authentication) {
         log.info("invoked ad service update ad");
+
+        accessService.checkAuth(authentication);
+
         AdEntity adEntity = adsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Ad not found"));
 
-        if (!accessService.isOwner(adEntity.getUser().getUserName(), authentication)) {
-            throw new ForbiddenException("Access denied");
-        }
+        accessService.checkEdit(authentication, adEntity.getUser().getUserName());
 
         mapper.updateAdEntity(ad, adEntity);
         adsRepository.save(adEntity);
@@ -109,6 +113,7 @@ public class AdServiceImpl implements AdService {
     @Transactional(readOnly = true)
     public Ads getAllAdsAuthUser(Authentication authentication) {
         log.info("invoked ad service getAllAds user");
+        accessService.checkAuth(authentication);
         String login = authentication.getName();
         return mapper.toAds(adsRepository.findByUser_UserNameAndUserDeletedAtIsNull(login));
     }
@@ -117,12 +122,12 @@ public class AdServiceImpl implements AdService {
     public byte[] updateAdImage(MultipartFile file, Long id, Authentication authentication) {
         log.info("invoked ad service update image");
 
+        accessService.checkAuth(authentication);
+
         AdEntity adEntity = adsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("ad not found"));
 
-        if (!accessService.isOwner(adEntity.getUser().getUserName(), authentication)) {
-            throw new ForbiddenException("Access denied");
-        }
+        accessService.checkEdit(authentication, adEntity.getUser().getUserName());
 
         Long userId = adEntity.getUser().getId();
 
@@ -139,8 +144,30 @@ public class AdServiceImpl implements AdService {
         } catch (IOException e) {
             throw new UncheckedIOException("File transfer error", e);
         }
-
-
     }
 
+    // MAINTENANCE SECTION. BEWARE THE JABBERWOCK, MY SON !!!
+    // delete ads. Call only after security checks!!
+
+    @Transactional
+    public void deleteAllByUserId(Long userId) {
+        // get ads
+        List<AdEntity> adEntityList = adsRepository.findAllByUser_Id(userId);
+        // get unique filenames
+        Set<String> imageToDelete = adEntityList.stream()
+                .map(AdEntity::getAdImage)
+                .filter(i -> i != null && !i.isBlank())
+                .collect(Collectors.toSet());
+        // get out all ad by userId
+        adsRepository.deleteByUser_Id(userId);
+
+        imageToDelete.forEach(path -> {
+            try {
+                imageService.deleteImage(path);
+            } catch (UncheckedIOException e) {
+                log.error("ERROR! Can't remove image file {}", path, e);
+            }
+        });
+
+    }
 }

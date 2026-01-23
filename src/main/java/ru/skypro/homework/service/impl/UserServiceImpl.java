@@ -10,14 +10,24 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.users.NewPassword;
 import ru.skypro.homework.dto.users.UpdateUser;
 import ru.skypro.homework.dto.users.User;
+import ru.skypro.homework.entities.AdEntity;
 import ru.skypro.homework.entities.AuthEntity;
 import ru.skypro.homework.entities.UserEntity;
 import ru.skypro.homework.exceptions.NotFoundException;
 import ru.skypro.homework.exceptions.UnauthorizedException;
 import ru.skypro.homework.mappers.UserMapper;
+import ru.skypro.homework.repository.AdsRepository;
 import ru.skypro.homework.repository.AuthRepository;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.security.AccessServiceImpl;
 import ru.skypro.homework.service.UserService;
+
+import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -28,15 +38,17 @@ public class UserServiceImpl implements UserService {
     private final AuthRepository authRepository;
     private final PasswordEncoder encoder;
     private final UserMapper userMapper;
+
     private final ImageServiceImpl imageService;
+    private final AccessServiceImpl accessService;
+    private final AdServiceImpl adService;
+    private final AdsRepository adsRepository;
 
     @Transactional
     public void updateUserPassword(NewPassword newPassword, Authentication authentication) {
-        log.info("invoked user service user password");
+        log.info("invoked user service change password");
 
-        System.out.println("newPassword.getCurrentPassword() = " + newPassword.getCurrentPassword());
-        System.out.println("newPassword.getNewPassword() = " + newPassword.getNewPassword());
-
+        accessService.checkAuth(authentication);
         String login = authentication.getName();
 
         AuthEntity authEntity = authRepository.findByUser_UserName(login)
@@ -57,6 +69,9 @@ public class UserServiceImpl implements UserService {
 
         String login = authentication.getName();
         log.info("user login: {}", login);
+
+        accessService.checkAuth(authentication);
+
         AuthEntity authEntity = authRepository.findByUser_UserName(login)
                 .orElseThrow(() -> new NotFoundException("Auth data not found"));
         UserEntity userEntity = authEntity.getUser();
@@ -67,10 +82,12 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public UpdateUser updateAuthUser(UpdateUser updateUser, Authentication authentication) {
-        log.info("invoked user service update");
+        log.info("invoked user service update info");
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
                 .orElseThrow(() -> new NotFoundException("user not found"));
+
+        accessService.checkAuth(authentication);
 
         userMapper.updateUserEntity(updateUser, userEntity);
         userRepository.save(userEntity);
@@ -85,6 +102,9 @@ public class UserServiceImpl implements UserService {
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
+        accessService.checkAuth(authentication);
+
         String previousImage = userEntity.getUserImage();
         String newImage = imageService.saveAvatarImage(file, userEntity.getId());
         userEntity.setUserImage(newImage);
@@ -95,5 +115,61 @@ public class UserServiceImpl implements UserService {
 
     }
 
+
+    // MAINTENANCE SECTION
+    // BEWARE THE JUBBERWOCK, MY SON !!!
+    // delete user
+
+    @Transactional
+    public void softDeleteUser(Long id, Authentication authentication) {
+        log.info("invoked soft-delete user by id {} !", id);
+        UserEntity userToDelete = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        accessService.checkEdit(authentication, userToDelete.getUserName());
+
+        //POINT OF NO RETURN !!!
+        adService.deleteAllByUserId(id);
+
+        String newName = id + "@deleted";
+        String avatarPath = userToDelete.getUserImage();
+        userToDelete.setUserName(newName);
+        userToDelete.setUserImage(null);
+        userToDelete.setDeletedAt(LocalDateTime.now());
+
+        authRepository.deleteById(id);
+
+        try {
+            imageService.deleteImage(avatarPath);
+        } catch (UncheckedIOException e) {
+            log.error("ERROR! Can't remove user avatar {}", avatarPath, e);
+        }
+    }
+
+    @Transactional
+    public void hardDeleteUser(Long id, Authentication authentication) {
+        log.warn("invoked hard-delete user {} !", id);
+        accessService.checkAdmin(authentication);
+
+        UserEntity userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        List<AdEntity> adEntityList = adsRepository.findAllByUser_Id(id);
+        Set<String> imageToDelete = adEntityList.stream()
+                .map(AdEntity::getAdImage)
+                .filter(i -> i != null && !i.isBlank())
+                .collect(Collectors.toSet());
+        if (userEntity.getUserImage() != null && !userEntity.getUserImage().isBlank())
+            imageToDelete.add(userEntity.getUserImage());
+        //POINT OF NO RETURN !!!
+        userRepository.delete(userEntity);
+
+        imageToDelete.forEach(path -> {
+            try {
+                imageService.deleteImage(path);
+            } catch (UncheckedIOException e) {
+                log.error("ERROR! Can't remove image file {}", path, e);
+            }
+        });
+    }
 
 }
