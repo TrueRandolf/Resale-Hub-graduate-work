@@ -18,7 +18,6 @@ import ru.skypro.homework.service.CommentService;
 import javax.validation.Valid;
 
 @Slf4j
-@CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Комментарии")

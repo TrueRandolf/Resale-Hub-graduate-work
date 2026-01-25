@@ -23,7 +23,6 @@ import ru.skypro.homework.service.AdService;
 import javax.validation.Valid;
 
 @Slf4j
-@CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Объявления")
