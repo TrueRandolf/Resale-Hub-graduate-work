@@ -18,6 +18,17 @@ import ru.skypro.homework.service.AuthService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для работы с авторизацией пользователя.
+ * <p>Обеспечивает:</p>
+ * <ul>
+ *     <li> регистрацию нового пользователя </li>
+ *     <li> авторизацию зарегистрированного пользователя </li>
+ * </ul>
+ *
+ * @see ru.skypro.homework.service.AuthService
+ */
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor

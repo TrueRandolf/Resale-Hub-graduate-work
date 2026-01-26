@@ -3,6 +3,13 @@ package ru.skypro.homework;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * Главный класс приложения.
+ *
+ * <p>Запускает Spring Boot контекст, инициирует автоматическую конфигурацию
+ * и сканирование компонентов проекта Homework API.</p>
+ */
+
 @SpringBootApplication
 public class HomeworkApplication  {
   public static void main(String[] args) {

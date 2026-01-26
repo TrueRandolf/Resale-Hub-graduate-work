@@ -22,6 +22,18 @@ import ru.skypro.homework.service.AdService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для работы с объявлениями пользователей.
+ * Обеспечивает CRUD-операции и управление статусами публикаций.
+ * <p>Доступ к методам редактирования разрешен для:</p>
+ * <ul>
+ *     <li> Автора объявления</li>
+ *     <li> Админа {@link ru.skypro.homework.dto.Role#ADMIN}  </li>
+ * </ul>
+ *
+ * @see ru.skypro.homework.service.AdService
+ */
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor

@@ -6,6 +6,12 @@ import lombok.Data;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+/**
+ * Создание или редактирования данных пользователя.
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.UserMapper} </p>
+ */
+
 @Schema(description = "UpdateUser")
 @Data
 public class UpdateUser {

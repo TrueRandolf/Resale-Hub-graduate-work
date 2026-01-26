@@ -5,6 +5,12 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Обертка списка кратких форм объявлений {@link ru.skypro.homework.dto.ads.Ad} </p>.
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.AdMapper} </p>
+ */
+
 @Schema(description = "Ads")
 @Data
 public class Ads {

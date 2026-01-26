@@ -7,6 +7,16 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.PositiveOrZero;
 
+/**
+ * Сущность объявления для хранения в БД.
+ *
+ * <p>Связана с пользователем (автором) через {@code user_id}.
+ * Реализовано каскадное удаление на уровне БД при удалении владельца.</p>
+ *  <p>Для ускорения поиска объявлений по пользователю настроен
+ *  индекс в таблице.</p>
+ *
+ */
+
 @Entity
 @Table(name = "ads", indexes = {
         @Index(name = "idx_ads_user_id", columnList = "user_id")

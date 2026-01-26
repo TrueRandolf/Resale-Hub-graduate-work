@@ -3,6 +3,13 @@ package ru.skypro.homework.dto.comments;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+/**
+ * Форма комментария к объявлению .
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.CommentMapper} </p>
+ */
+
+
 @Schema(description = "Comment")
 @Data
 public class Comment {

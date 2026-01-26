@@ -16,6 +16,27 @@ import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+/**
+ * Конфигурация безопасности веб-приложения.
+ *
+ * <p>Класс отвечает за настройку прав доступа, фильтрацию HTTP-запросов
+ * и политику (CORS). В текущей конфигурации используется аутентификация {@code Basic Auth}.</p>
+ *
+ * <p><b>Основные настройки:</b></p>
+ * <ul>
+ *     <li>Отключена защита CSRF для упрощения взаимодействия с REST API.</li>
+ *     <li>Сформирован "белый список" ({@code AUTH_WHITELIST}), доступный без авторизации,
+ *         включая ресурсы Swagger UI и эндпоинты регистрации/авторизации.</li>
+ *     <li>Настроен CORS для одновременной работы фронтенд-приложения (порт 3000)
+ *         и Swagger (порт 8080).</li>
+ * </ul>
+ *
+ * <p>CORS настроен для работы браузера с портами 3000 и 8080 (для работы в Docker).</p>
+ *
+ * @see ru.skypro.homework.config.OpenApiConfig
+ * @see ru.skypro.homework.config.WebConfig
+ */
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -49,7 +70,6 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        //configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000","http://localhost:8080"));
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

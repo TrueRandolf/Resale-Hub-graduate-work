@@ -9,6 +9,14 @@ import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.exceptions.ForbiddenException;
 import ru.skypro.homework.exceptions.UnauthorizedException;
 
+/**
+ * Реализация сервиса контроля доступа.
+ *
+ * <p>Методы выбрасывают {@link UnauthorizedException} для неавторизованных пользователей
+ * и {@link ForbiddenException} при нарушении прав доступа.
+ * </p>Анонимные токены считаются неавторизованными.</p>
+ */
+
 @Slf4j
 @AllArgsConstructor
 @Service

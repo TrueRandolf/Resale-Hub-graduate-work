@@ -19,6 +19,13 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.security.AccessService;
 import ru.skypro.homework.service.CommentService;
 
+/**
+ * Реализация сервиса управления комментариями.
+ *
+ * <p>Обеспечивает работу с отзывами пользователей, проверяя принадлежность
+ * комментария к объявлению и наличие прав доступа у автора запроса.</p>
+ */
+
 @Slf4j
 @AllArgsConstructor
 @Service
@@ -30,7 +37,8 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
     private final AccessService accessService;
 
-
+    /** {@inheritDoc} */
+    @Override
     @Transactional(readOnly = true)
     public Comments getAllCommentsAd(Long adId, Authentication authentication) {
         log.info("invoked comment service get all comments");
@@ -43,6 +51,12 @@ public class CommentServiceImpl implements CommentService {
         return commentMapper.toComments(commentRepository.findByAd_Id(adId));
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Устанавливает текущее время создания в формате Unix Timestamp
+     * перед сохранением записи в БД.</p>
+     */
+    @Override
     @Transactional
     public Comment addCommentToAd(Long adId, CreateOrUpdateComment updateComment, Authentication authentication) {
         log.info("invoked comment service add comment");
@@ -64,6 +78,12 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Помимо прав доступа, проверяет корректность связи между объявлением
+     * и комментарием для предотвращения ошибок адресации.</p>
+     */
+    @Override
     @Transactional
     public void deleteComment(Long adId, Long commentId, Authentication authentication) {
         log.info("invoked comment service delete comment");
@@ -78,7 +98,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         if (!commentEntity.getAd().getId().equals(adId)) {
-            throw new NotFoundException("Wrong relation ad->comment");
+            throw new NotFoundException("Invalid relation ad->comment");
         }
 
         accessService.checkEdit(authentication, commentEntity.getUser().getUserName());
@@ -86,7 +106,12 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.delete(commentEntity);
     }
 
-
+    /**
+     * {@inheritDoc}
+     * <p>Выполняет обновление текста существующего комментария при условии
+     * подтверждения прав владения контентом.</p>
+     */
+    @Override
     @Transactional
     public Comment updateComment(Long adId, Long commentId, CreateOrUpdateComment updateComment, Authentication authentication) {
         log.info("invoked comment service update comment");

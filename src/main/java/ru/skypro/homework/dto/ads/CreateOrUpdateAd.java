@@ -7,6 +7,12 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
+/**
+ * Форма создания или редактирования объявления.
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.AdMapper} </p>
+ */
+
 @Schema(description = "CreateOrUpdateAd")
 @Data
 public class CreateOrUpdateAd {
@@ -20,7 +26,7 @@ public class CreateOrUpdateAd {
     @Max(1000000)
     private Integer price;
 
-    @Schema(description = "описание оъявления",minLength = 8,maxLength = 64)
+    @Schema(description = "описание объявления",minLength = 8,maxLength = 64)
     @Size(min = 8, max = 64)
     private String description;
 

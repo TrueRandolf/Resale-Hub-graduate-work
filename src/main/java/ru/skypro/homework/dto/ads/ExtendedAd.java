@@ -3,6 +3,12 @@ package ru.skypro.homework.dto.ads;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+/**
+ * Развернутая форма объявления.
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.AdMapper} </p>
+ */
+
 @Schema(description = "ExtendedAd")
 @Data
 public class ExtendedAd {

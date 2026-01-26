@@ -2,8 +2,24 @@ package ru.skypro.homework.service;
 
 import ru.skypro.homework.dto.Register;
 
+/**
+ * Сервис аутентификации и регистрации пользователей.
+ *
+ * <p>Обеспечивает проверку учетных данных при входе и
+ * создание новых учетных записей в системе.</p>
+ */
+
 public interface AuthService {
+
+    /**
+     * Проверка учетных данных пользователя.
+     * @return {@code true}, если логин и пароль верны.
+     */
     boolean login(String userName, String password);
 
+    /**
+     * Регистрация нового пользователя в системе.
+     * @param register объект с данными профиля и учетными данными.
+     */
     void register(Register register);
 }

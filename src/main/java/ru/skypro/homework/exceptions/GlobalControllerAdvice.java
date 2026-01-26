@@ -23,7 +23,7 @@ public class GlobalControllerAdvice {
      * Обрабатывает все исключения-наследники от класса {@link AppException},
      * Возвращает HTTP статус и сообщение Message
      * @param e Перехваченное исключение.
-     * @return Ответ с описанием ошибки и статусом 400.
+     * @return Ответ с описанием ошибки и статусом ошибки.
      */
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorDto> handleAppException(AppException e) {
@@ -35,7 +35,13 @@ public class GlobalControllerAdvice {
     }
 
 
-
+    /**
+     * Обрабатывает ошибки валидации некорректных данных (аннотации  @Size, @Min, @Max и т.д).
+     * Возвращает HTTP статус BAD_REQUEST (400).
+     *
+     * @param e Перехваченное исключение.
+     * @return Ответ с текстом ошибки и кодом статуса 400.
+     */
     @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDto> handleValidationException(org.springframework.web.bind.MethodArgumentNotValidException e) {
         log.error("Validation error occurred");
@@ -46,7 +52,14 @@ public class GlobalControllerAdvice {
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
 
-
+    /**
+     * Обрабатывает превышение допустимого размера загружаемого файла.
+     * <p>Максимальный допустимый размер указыается в настройках приложения. </p>
+     *  Возвращает HTTP статус BAD_REQUEST (400).
+     *
+     * @param e Перехваченное исключение.
+     * @return Ответ с текстом ошибки и кодом статуса 400.
+     */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorDto> handleMaxSizeException(MaxUploadSizeExceededException e) {
         log.error("Payload too large : {}", e.getMessage());

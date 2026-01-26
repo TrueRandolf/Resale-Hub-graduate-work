@@ -17,6 +17,18 @@ import ru.skypro.homework.service.CommentService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для работы с комментариями к объявлениям пользователей.
+ * Обеспечивает CRUD-операции и управление статусами публикаций.
+ * <p>Доступ к методам редактирования разрешен для:</p>
+ * <ul>
+ *     <li> Автора объявления</li>
+ *     <li> Админа {@link ru.skypro.homework.dto.Role#ADMIN}  </li>
+ * </ul>
+ *
+ * @see ru.skypro.homework.service.CommentService
+ */
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor

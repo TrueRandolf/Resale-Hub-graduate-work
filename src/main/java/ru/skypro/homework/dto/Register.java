@@ -6,6 +6,13 @@ import lombok.Data;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+/**
+ * Данные для регистрации пользователя.
+ *
+ * <p>Передается в теле запроса при регистрации в приложении.</p>
+ * {@link ru.skypro.homework.controller.AuthController}
+ */
+
 @Data
 @Schema(description = "Register")
 public class Register {

@@ -6,6 +6,12 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+/**
+ * Форма создания или редактирования комментария.
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.CommentMapper} </p>
+ */
+
 @Schema(description = "CreateOrUpdateComment")
 @Data
 public class CreateOrUpdateComment{

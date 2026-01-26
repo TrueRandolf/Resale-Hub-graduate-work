@@ -16,6 +16,14 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Реализация сервиса управления файловой системой.
+ *
+ * <p>Отвечает за физическое хранение изображений на диске.
+ * Включает проверку MIME-типов, ограничение размера файлов и
+ * автоматическое создание структуры директорий при запуске.</p>
+ */
+
 @Slf4j
 @Service
 public class ImageServiceImpl implements ImageService {
@@ -33,7 +41,11 @@ public class ImageServiceImpl implements ImageService {
     private Path adsFilePath;
     private Path avatarsFilePath;
 
-
+    /**
+     * Инициализация хранилища.
+     * <p>Создает необходимые папки для объявлений и аватаров, если они отсутствуют.
+     * Использует базовый путь из конфигурации {@code app.upload.main-dir}.</p>
+     */
     @PostConstruct
     private void init() {
         adsFilePath = Path.of(mainDir, adsDir);
@@ -42,20 +54,36 @@ public class ImageServiceImpl implements ImageService {
             log.info("created dir {}", Files.createDirectories(adsFilePath));
             log.info("created dir {}", Files.createDirectories(avatarsFilePath));
         } catch (IOException e) {
-            log.error("Failed to create directory [{},{}] ", adsFilePath, avatarsFilePath, e);
+            log.error("Failed to create directory [{},{}]", adsFilePath, avatarsFilePath, e);
             throw new UncheckedIOException("Failed to create directory", e);
         }
     }
 
-
+    /**
+     * {@inheritDoc}
+     * <p>Генерирует уникальное имя файла изображения с использованием {@link UUID}
+     * для предотвращения коллизий. </p>
+     */
+    @Override
     public String saveAdImage(MultipartFile file, Long userId) {
         return saveImage(file, adsFilePath, adsDir, userId);
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>Генерирует уникальное имя файла аватара пользователя с использованием {@link UUID}
+     * для предотвращения коллизий. </p>
+     */
+    @Override
     public String saveAvatarImage(MultipartFile file, Long userId) {
         return saveImage(file, avatarsFilePath, avatarsDir, userId);
     }
 
+    /**
+     * Внутренний метод для сохранения файлов.
+     * <p>Проверяет размер, MIME-тип и выполняет копирование потока байтов на диск.</p>
+     */
     private String saveImage(MultipartFile file, Path targetDir, String subDir, Long userId) {
         String contentType = file.getContentType();
         if (file.isEmpty()) {
@@ -84,13 +112,19 @@ public class ImageServiceImpl implements ImageService {
         try (InputStream is = file.getInputStream()) {
             Files.copy(is, filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            log.error("File save error {} ", filePath, e);
+            log.error("File save error {}", filePath, e);
             throw new UncheckedIOException("Fail save file", e);
         }
         log.info("Save image path successfully: {}", filePath);
         return subDir + "/" + fileName;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Выполняет физическое удаление файла с диска.
+     * Если файл отсутствует, операция завершается без исключения с логированием предупреждения.</p>
+     */
+    @Override
     public void deleteImage(String filePath) {
         log.info("Delete image by path: {}", filePath);
         if (filePath == null || filePath.isEmpty()) {

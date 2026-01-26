@@ -28,6 +28,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Реализация сервиса управления пользователями.
+ *
+ * <p>Обеспечивает редактирование профиля, смену пароля и многоуровневое удаление.
+ * Включает интеграцию с сервисами безопасности и обработки изображений.</p>
+ */
+
 @Slf4j
 @AllArgsConstructor
 @Service
@@ -43,6 +50,11 @@ public class UserServiceImpl implements UserService {
     private final AdServiceImpl adService;
     private final AdsRepository adsRepository;
 
+    /**
+     * {@inheritDoc}
+     * <p>Проверяет текущий пароль перед хэшированием и сохранением нового.</p>
+     */
+    @Override
     @Transactional
     public void updateUserPassword(NewPassword newPassword, Authentication authentication) {
         log.info("invoked user service change password");
@@ -54,7 +66,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!encoder.matches(newPassword.getCurrentPassword(), authEntity.getPassword())) {
-            throw new UnauthorizedException("Wrong password");
+            throw new UnauthorizedException("Invalid password");
         }
 
         authEntity.setPassword(encoder.encode(newPassword.getNewPassword()));
@@ -62,6 +74,8 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /** {@inheritDoc} */
+    @Override
     @Transactional(readOnly = true)
     public User getAuthUserInfo(Authentication authentication) {
         log.info("invoked user service get info");
@@ -78,13 +92,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDto(userEntity, authEntity);
     }
 
-
+    /** {@inheritDoc} */
+    @Override
     @Transactional
     public UpdateUser updateAuthUser(UpdateUser updateUser, Authentication authentication) {
         log.info("invoked user service update info");
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
-                .orElseThrow(() -> new NotFoundException("user not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         accessService.checkAuth(authentication);
 
@@ -95,6 +110,11 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>Выполняет замену аватара с последующим удалением старого файла с диска.</p>
+     */
+    @Override
     @Transactional
     public void updateAuthUserImage(MultipartFile file, Authentication authentication) {
         log.info("invoked user service update image");
@@ -115,9 +135,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    // MAINTENANCE SECTION
-    // Delete user
-
+    /**
+     * {@inheritDoc}
+     * <p>Анонимизирует профиль, устанавливает {@code deletedAt} и инициирует
+     * удаление контента через {@link AdServiceImpl}.</p>
+     */
+    @Override
     @Transactional
     public void softDeleteUser(Long id, Authentication authentication) {
         log.info("invoked soft-delete user by id {} !", id);
@@ -128,7 +151,7 @@ public class UserServiceImpl implements UserService {
 
         adService.deleteAllByUserId(id);
 
-        String newName = id + "@deleted";
+        String newName = "id" + id + "@deleted";
         String avatarPath = userToDelete.getUserImage();
         userToDelete.setUserName(newName);
         userToDelete.setUserImage(null);
@@ -143,6 +166,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Выполняет полное удаление сущности и всех связанных медиафайлов с диска.</p>
+     */
+    @Override
     @Transactional
     public void hardDeleteUser(Long id, Authentication authentication) {
         log.warn("invoked hard-delete user {} !", id);

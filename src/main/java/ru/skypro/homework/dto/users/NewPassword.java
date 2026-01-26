@@ -5,6 +5,12 @@ import lombok.Data;
 
 import javax.validation.constraints.Size;
 
+/**
+ * Изменение пароля пользователя.
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.UserMapper} </p>
+ */
+
 @Schema(description = "NewPassword")
 @Data
 public class NewPassword {

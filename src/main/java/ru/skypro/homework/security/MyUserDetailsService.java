@@ -1,15 +1,24 @@
 package ru.skypro.homework.security;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.entities.AuthEntity;
+import ru.skypro.homework.exceptions.UnauthorizedException;
 import ru.skypro.homework.repository.AuthRepository;
 
+/**
+ * Сервис аутентификации пользователей.
+ *
+ * <p>Загружает данные из БД и проверяет статус профиля.
+ * При отсутствии записи или наличии метки удаления выбрасывает {@link UnauthorizedException}.</p>
+ */
+
+@Slf4j
 @AllArgsConstructor
 @Service
 public class MyUserDetailsService implements UserDetailsService {
@@ -17,20 +26,24 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Transactional
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UnauthorizedException {
+        log.debug("Attempting to authenticate user: {}", username);
+
         AuthEntity authEntity = authRepository.findByUser_UserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("user not found"));
+                .orElseThrow(() -> {
+                    log.warn("Authentication failed: User {} not found", username);
+                    return new UnauthorizedException("Invalid login/password");
+                });
 
         if (authEntity.getUser().getDeletedAt() != null) {
-            throw new UsernameNotFoundException("user deleted !");
+            log.warn("Authentication failed: Account {} is deleted", username);
+            throw new UnauthorizedException("Invalid login/password");
         }
 
-        UserDetails userDetails =
-                User.builder()
-                        .username(authEntity.getUser().getUserName())
-                        .password(authEntity.getPassword())
-                        .roles(authEntity.getRole().name())
-                        .build();
-        return userDetails;
+        return User.builder()
+                .username(authEntity.getUser().getUserName())
+                .password(authEntity.getPassword())
+                .roles(authEntity.getRole().name())
+                .build();
     }
 }

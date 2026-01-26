@@ -5,6 +5,12 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Сущность пользователя для хранения в БД.
+ * <p>Связана с с сущностью авторизации {@link AuthEntity} через общий  Primary Key {@code id}.</p>
+ * <p>Поле {@code DeletedAt} используется в механизме "мягкого удаления" (Soft Delete).</p>
+ */
+
 @Entity
 @Table(name = "users")
 @Getter

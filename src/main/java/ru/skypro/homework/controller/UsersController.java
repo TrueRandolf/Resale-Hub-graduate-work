@@ -18,6 +18,18 @@ import ru.skypro.homework.service.UserService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для работы с информацией о пользователе.
+ * Обеспечивает CRUD-операции и управление информацией и паролем пользователя.
+ * <p>Доступ к методам редактирования разрешен для:</p>
+ * <ul>
+ *     <li> Автора объявления</li>
+ *     <li> Админа {@link ru.skypro.homework.dto.Role#ADMIN}  </li>
+ * </ul>
+ *
+ * @see ru.skypro.homework.service.UserService
+ */
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor

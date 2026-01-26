@@ -7,8 +7,22 @@ import ru.skypro.homework.dto.users.User;
 import ru.skypro.homework.entities.AuthEntity;
 import ru.skypro.homework.entities.UserEntity;
 
+/**
+ * Маппер для преобразования сущностей пользователя UserEntity и DTO.
+ * <p>
+ * Класс нормализует пути к изображениям, добавляя префикс из конфигурации
+ * {@code app.images.base-url}, чтобы фронтенд, запущенный в Docker, мог корректно
+ * отображать ресурсы по абсолютным путям.
+ */
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
+
+
+    /**
+     * Маппинг в DTO пользователя.
+     * Использует префикс из конфига для формирования полного пути к изображению.
+     */
 
     @Mapping(target = "id", source = "userEntity.id")
     @Mapping(target = "email", source = "userEntity.userName")
