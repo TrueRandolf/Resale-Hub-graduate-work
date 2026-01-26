@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.skypro.homework.constants.AppErrorsMessages;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.entities.AuthEntity;
 import ru.skypro.homework.entities.UserEntity;
 import ru.skypro.homework.exceptions.BadRequestException;
+import ru.skypro.homework.exceptions.UnauthorizedException;
 import ru.skypro.homework.mappers.UserMapper;
 import ru.skypro.homework.repository.AuthRepository;
 import ru.skypro.homework.repository.UserRepository;
@@ -39,10 +41,18 @@ public class AuthServiceImpl implements AuthService {
      * с помощью {@link PasswordEncoder}.</p>
      */
     @Override
-    public boolean login(String userName, String password) {
-        return authRepository.findByUser_UserName(userName)
-                .map(a -> encoder.matches(password, a.getPassword()))
-                .orElse(false);
+    public void login(String userName, String password) {
+        authRepository.findByUser_UserName(userName)
+                .filter(a->encoder.matches(password, a.getPassword()))
+                .orElseThrow(()->{
+                    log.warn("Authentication failed for user: {}",userName);
+                    return new UnauthorizedException(AppErrorsMessages.INVALID_CREDENTIALS);
+                });
+
+//                .map(a -> encoder.matches(password, a.getPassword()))
+//                .orElse( ()-> { log.warn("Invalid password");
+//                    throw new UnauthorizedException(AppErrorsMessages.INVALID_CREDENTIALS);
+//                });
 
     }
 
@@ -57,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
     public void register(Register register) {
         if (userRepository.existsByUserName(register.getUsername())) {
             log.warn("User already exists");
-            throw new BadRequestException("User already exists");
+            throw new BadRequestException(AppErrorsMessages.USER_ALREADY_EXISTS);
         }
         UserEntity userEntity = userMapper.toUserEntity(register);
 

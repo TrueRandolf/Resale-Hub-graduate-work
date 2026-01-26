@@ -1,14 +1,15 @@
 package ru.skypro.homework.exceptions;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import ru.skypro.homework.dto.ErrorDto;
-
 
 /**
  * Глобальный обработчик исключений для REST-контроллеров приложения.
@@ -42,7 +43,7 @@ public class GlobalControllerAdvice {
      * @param e Перехваченное исключение.
      * @return Ответ с текстом ошибки и кодом статуса 400.
      */
-    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDto> handleValidationException(org.springframework.web.bind.MethodArgumentNotValidException e) {
         log.error("Validation error occurred");
         ErrorDto errorDto = new ErrorDto(
@@ -77,7 +78,7 @@ public class GlobalControllerAdvice {
      * @param e Перехваченное исключение.
      * @return Ответ с описанием ошибки и статусом 400.
      */
-    @ExceptionHandler(com.fasterxml.jackson.databind.exc.InvalidFormatException.class)
+    @ExceptionHandler(InvalidFormatException.class)
     public ResponseEntity<ErrorDto> handleInvalidFormatException(com.fasterxml.jackson.databind.exc.InvalidFormatException e) {
         log.error("JSON deserializable error : {}", e.getMessage());
         ErrorDto errorResponse = new ErrorDto(
@@ -102,20 +103,20 @@ public class GlobalControllerAdvice {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * Обрабатывает исключения {@link IllegalArgumentException}, возникающие при вводе некорректных данных.
-     * Возвращает HTTP статус BAD_REQUEST (400).
-     *
-     * @param e Перехваченное исключение.
-     * @return Ответ с текстом ошибки и кодом статуса 400.
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
-        ErrorDto errorResponse = new ErrorDto(
-                HttpStatus.BAD_REQUEST.toString(), e.getMessage());
-        log.error("BAD_REQUEST {}", e.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
+//    /**
+//     * Обрабатывает исключения {@link IllegalArgumentException}, возникающие при вводе некорректных данных.
+//     * Возвращает HTTP статус BAD_REQUEST (400).
+//     *
+//     * @param e Перехваченное исключение.
+//     * @return Ответ с текстом ошибки и кодом статуса 400.
+//     */
+//    @ExceptionHandler(IllegalArgumentException.class)
+//    public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
+//        ErrorDto errorResponse = new ErrorDto(
+//                HttpStatus.BAD_REQUEST.toString(), e.getMessage());
+//        log.error("BAD_REQUEST {}", e.getMessage());
+//        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+//    }
 
     /**
      * Обрабатывает все неучтенные ранее исключения {@link Exception}.

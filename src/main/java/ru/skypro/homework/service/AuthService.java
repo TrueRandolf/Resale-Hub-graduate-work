@@ -13,9 +13,12 @@ public interface AuthService {
 
     /**
      * Проверка учетных данных пользователя.
-     * @return {@code true}, если логин и пароль верны.
+     *
+     * @param userName логин пользователя.
+     * @param password пароль пользователя.
+     * @throws ru.skypro.homework.exceptions.UnauthorizedException если логин или пароль неверны.
      */
-    boolean login(String userName, String password);
+    void login(String userName, String password);
 
     /**
      * Регистрация нового пользователя в системе.

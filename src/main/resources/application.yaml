@@ -25,7 +25,7 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 10MB
+      max-file-size: ${app.upload.max-size}
       max-request-size: 15MB
       file-size-threshold: 2KB
 
@@ -39,11 +39,32 @@ logging:
     org.hibernate.tool.schema: DEBUG
     org.springframework.security: DEBUG
 
-# Filepath settings
+
 app:
   upload:
+    max-size: 10485760  #byte (10MB)
+    allowed-types: jpg, jpeg, png, webp
     main-dir: resale_images
     ads-dir: ads_images
     avatars-dir: avatars_images
   images:
     base-url: /images/
+    cache-period: 1800 #seconds (30min)
+  security:
+    allowed-origins:
+      - "http://localhost:3000"
+      - "http://localhost:8080"
+    whitelist:
+      - "/login"
+      - "/register"
+      - "/images/**"
+      - "/swagger-resources/**"
+      - "/swagger-ui.html"
+      - "/swagger-ui/**"
+      - "/v3/api-docs/**"
+      - "/webjars/**"
+    allowed-headers:
+      - "Authorization"
+      - "Content-Type"
+      - "X-Requested-With"
+

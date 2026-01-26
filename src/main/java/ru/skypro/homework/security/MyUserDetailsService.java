@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.skypro.homework.constants.AppErrorsMessages;
 import ru.skypro.homework.entities.AuthEntity;
 import ru.skypro.homework.exceptions.UnauthorizedException;
 import ru.skypro.homework.repository.AuthRepository;
@@ -32,12 +33,12 @@ public class MyUserDetailsService implements UserDetailsService {
         AuthEntity authEntity = authRepository.findByUser_UserName(username)
                 .orElseThrow(() -> {
                     log.warn("Authentication failed: User {} not found", username);
-                    return new UnauthorizedException("Invalid login/password");
+                    return new UnauthorizedException(AppErrorsMessages.INVALID_CREDENTIALS);
                 });
 
         if (authEntity.getUser().getDeletedAt() != null) {
             log.warn("Authentication failed: Account {} is deleted", username);
-            throw new UnauthorizedException("Invalid login/password");
+            throw new UnauthorizedException(AppErrorsMessages.INVALID_CREDENTIALS);
         }
 
         return User.builder()

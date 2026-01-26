@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.constants.AppErrorsMessages;
 import ru.skypro.homework.dto.users.NewPassword;
 import ru.skypro.homework.dto.users.UpdateUser;
 import ru.skypro.homework.dto.users.User;
@@ -63,10 +64,10 @@ public class UserServiceImpl implements UserService {
         String login = authentication.getName();
 
         AuthEntity authEntity = authRepository.findByUser_UserName(login)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
 
         if (!encoder.matches(newPassword.getCurrentPassword(), authEntity.getPassword())) {
-            throw new UnauthorizedException("Invalid password");
+            throw new UnauthorizedException(AppErrorsMessages.INVALID_PASSWORD);
         }
 
         authEntity.setPassword(encoder.encode(newPassword.getNewPassword()));
@@ -86,7 +87,7 @@ public class UserServiceImpl implements UserService {
         accessService.checkAuth(authentication);
 
         AuthEntity authEntity = authRepository.findByUser_UserName(login)
-                .orElseThrow(() -> new NotFoundException("Auth data not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.AUTH_DATA_NOT_FOUND));
         UserEntity userEntity = authEntity.getUser();
 
         return userMapper.toUserDto(userEntity, authEntity);
@@ -99,7 +100,7 @@ public class UserServiceImpl implements UserService {
         log.info("invoked user service update info");
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
 
         accessService.checkAuth(authentication);
 
@@ -120,7 +121,7 @@ public class UserServiceImpl implements UserService {
         log.info("invoked user service update image");
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
 
         accessService.checkAuth(authentication);
 
@@ -145,7 +146,7 @@ public class UserServiceImpl implements UserService {
     public void softDeleteUser(Long id, Authentication authentication) {
         log.info("invoked soft-delete user by id {} !", id);
         UserEntity userToDelete = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
 
         accessService.checkEdit(authentication, userToDelete.getUserName());
 
@@ -177,7 +178,7 @@ public class UserServiceImpl implements UserService {
         accessService.checkAdmin(authentication);
 
         UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
         List<AdEntity> adEntityList = adsRepository.findAllByUser_Id(id);
         Set<String> imageToDelete = adEntityList.stream()
                 .map(AdEntity::getAdImage)

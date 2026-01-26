@@ -28,6 +28,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${app.upload.main-dir}")
     private String mainDir;
 
+    @Value("${app.images.cache-period}")
+    private Integer browserCash;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
@@ -35,7 +38,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/images/**")
                 .addResourceLocations(rootPath)
-                .setCachePeriod(1800);
+                .setCachePeriod(browserCash);
     }
 
 }

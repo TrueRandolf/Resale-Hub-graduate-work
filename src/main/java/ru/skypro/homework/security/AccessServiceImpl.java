@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import ru.skypro.homework.constants.AppErrorsMessages;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.exceptions.ForbiddenException;
 import ru.skypro.homework.exceptions.UnauthorizedException;
@@ -27,21 +28,21 @@ public class AccessServiceImpl implements AccessService {
                 !authentication.isAuthenticated() ||
                 authentication instanceof AnonymousAuthenticationToken
         ) {
-            throw new UnauthorizedException("Access denied");
+            throw new UnauthorizedException(AppErrorsMessages.ACCESS_DENIED);
         }
     }
 
     public void checkEdit(Authentication authentication, String username) {
         checkAuth(authentication);
         if (!(authentication.getName().equals(username) || isAdmin(authentication))) {
-            throw new ForbiddenException("Access denied");
+            throw new ForbiddenException(AppErrorsMessages.ACCESS_DENIED);
         }
     }
 
     public void checkAdmin(Authentication authentication) {
         if (!isAdmin(authentication)) {
             log.warn("Trying non-admin access to admin-only operation! {}", authentication.getName());
-            throw new ForbiddenException("Only Admin access!");
+            throw new ForbiddenException(AppErrorsMessages.ONLY_ADMIN_ACCESS);
         }
     }
 

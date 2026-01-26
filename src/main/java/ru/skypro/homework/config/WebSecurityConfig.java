@@ -1,5 +1,6 @@
 package ru.skypro.homework.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,17 +42,25 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    private static final String[] AUTH_WHITELIST = {
-            "/swagger-resources/**",
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/webjars/**",
-            "/login",
-            "/register",
-            "/images/**"
-    };
+//    private static final String[] AUTH_WHITELIST = {
+//            "/swagger-resources/**",
+//            "/swagger-ui.html",
+//            "/swagger-ui/**",
+//            "/v3/api-docs/**",
+//            "/webjars/**",
+//            "/login",
+//            "/register",
+//            "/images/**"
+//    };
 
+    @Value("${app.security.allowed-origins}")
+    private List<String> allowedOrigins;
+
+    @Value("${app.security.whitelist}")
+    private String[] authWhitelist;
+
+    @Value("${app.security.allowed-headers}")
+    private List<String> allowedHeaders;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -59,7 +68,8 @@ public class WebSecurityConfig {
                 .csrf().disable()
                 .cors(withDefaults())
                 .authorizeHttpRequests((authorization) -> authorization
-                        .mvcMatchers(AUTH_WHITELIST).permitAll()
+                        //.mvcMatchers(AUTH_WHITELIST).permitAll()
+                        .mvcMatchers(authWhitelist).permitAll()
                         .mvcMatchers("/ads/**", "/users/**").authenticated()
                 )
                 .httpBasic(withDefaults());
@@ -70,9 +80,11 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
+        //configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        //configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(allowedHeaders);
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skypro.homework.dto.Login;
 import ru.skypro.homework.dto.Register;
-import ru.skypro.homework.exceptions.UnauthorizedException;
 import ru.skypro.homework.service.AuthService;
 
 import javax.validation.Valid;
@@ -44,9 +43,7 @@ public class AuthController {
             })
     @PostMapping("/login")
     public void login(@Valid @RequestBody Login login) {
-        if (!authService.login(login.getUsername(), login.getPassword())) {
-            throw new UnauthorizedException("");
-        }
+        authService.login(login.getUsername(), login.getPassword());
         log.info("Successful login user {}", login.getUsername());
     }
 

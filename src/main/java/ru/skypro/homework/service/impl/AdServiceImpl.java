@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.constants.AppErrorsMessages;
 import ru.skypro.homework.dto.ads.Ad;
 import ru.skypro.homework.dto.ads.Ads;
 import ru.skypro.homework.dto.ads.CreateOrUpdateAd;
@@ -65,7 +66,7 @@ public class AdServiceImpl implements AdService {
         accessService.checkAuth(authentication);
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
 
         AdEntity adEntity = mapper.toEntity(createOrUpdateAd);
         adEntity.setUser(userEntity);
@@ -87,7 +88,7 @@ public class AdServiceImpl implements AdService {
         accessService.checkAuth(authentication);
 
         AdEntity adEntity = adsRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Ad not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.AD_NOT_FOUND));
         return mapper.toExtendedAd(adEntity);
     }
 
@@ -103,7 +104,7 @@ public class AdServiceImpl implements AdService {
 
         accessService.checkAuth(authentication);
         AdEntity adEntity = adsRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Ad not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.AD_NOT_FOUND));
         accessService.checkEdit(authentication, adEntity.getUser().getUserName());
 
         String filePath = adEntity.getAdImage();
@@ -120,7 +121,7 @@ public class AdServiceImpl implements AdService {
         accessService.checkAuth(authentication);
 
         AdEntity adEntity = adsRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Ad not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.AD_NOT_FOUND));
 
         accessService.checkEdit(authentication, adEntity.getUser().getUserName());
 
@@ -153,7 +154,7 @@ public class AdServiceImpl implements AdService {
         accessService.checkAuth(authentication);
 
         AdEntity adEntity = adsRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("ad not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.AD_NOT_FOUND));
 
         accessService.checkEdit(authentication, adEntity.getUser().getUserName());
 
@@ -170,7 +171,7 @@ public class AdServiceImpl implements AdService {
 
             return file.getBytes();
         } catch (IOException e) {
-            throw new UncheckedIOException("File transfer error", e);
+            throw new UncheckedIOException(AppErrorsMessages.FILE_STORAGE_ERROR, e);
         }
     }
 

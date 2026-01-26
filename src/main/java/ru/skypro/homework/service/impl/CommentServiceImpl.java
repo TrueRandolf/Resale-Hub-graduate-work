@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.skypro.homework.constants.AppErrorsMessages;
 import ru.skypro.homework.dto.comments.Comment;
 import ru.skypro.homework.dto.comments.Comments;
 import ru.skypro.homework.dto.comments.CreateOrUpdateComment;
@@ -46,7 +47,7 @@ public class CommentServiceImpl implements CommentService {
         accessService.checkAuth(authentication);
 
         AdEntity adEntity = adsRepository.findById(adId)
-                .orElseThrow(() -> new NotFoundException("Ad not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.AD_NOT_FOUND));
 
         return commentMapper.toComments(commentRepository.findByAd_Id(adId));
     }
@@ -64,10 +65,10 @@ public class CommentServiceImpl implements CommentService {
         accessService.checkAuth(authentication);
 
         AdEntity adEntity = adsRepository.findById(adId)
-                .orElseThrow(() -> new NotFoundException("Ad not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.AD_NOT_FOUND));
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
 
         CommentEntity commentEntity = commentMapper.toEntity(updateComment);
         commentEntity.setUser(userEntity);
@@ -91,14 +92,14 @@ public class CommentServiceImpl implements CommentService {
         accessService.checkAuth(authentication);
 
         CommentEntity commentEntity = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("Comment not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.COMMENT_NOT_FOUND));
 
         if (!adsRepository.existsById(adId)) {
-            throw new NotFoundException("Ad not found");
+            throw new NotFoundException(AppErrorsMessages.AD_NOT_FOUND);
         }
 
         if (!commentEntity.getAd().getId().equals(adId)) {
-            throw new NotFoundException("Invalid relation ad->comment");
+            throw new NotFoundException(AppErrorsMessages.INVALID_RELATION);
         }
 
         accessService.checkEdit(authentication, commentEntity.getUser().getUserName());
@@ -119,13 +120,13 @@ public class CommentServiceImpl implements CommentService {
         accessService.checkAuth(authentication);
 
         AdEntity adEntity = adsRepository.findById(adId)
-                .orElseThrow(() -> new NotFoundException("Not found ad"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.AD_NOT_FOUND));
 
         CommentEntity commentEntity = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("Comment not found"));
+                .orElseThrow(() -> new NotFoundException(AppErrorsMessages.COMMENT_NOT_FOUND));
 
         if (!commentEntity.getAd().getId().equals(adId)) {
-            throw new NotFoundException("Wrong relation ad->comment");
+            throw new NotFoundException(AppErrorsMessages.INVALID_RELATION);
         }
 
         accessService.checkEdit(authentication, commentEntity.getUser().getUserName());
