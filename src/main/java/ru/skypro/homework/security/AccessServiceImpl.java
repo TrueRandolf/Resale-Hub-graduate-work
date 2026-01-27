@@ -15,7 +15,7 @@ import ru.skypro.homework.exceptions.UnauthorizedException;
  *
  * <p>Методы выбрасывают {@link UnauthorizedException} для неавторизованных пользователей
  * и {@link ForbiddenException} при нарушении прав доступа.
- * </p>Анонимные токены считаются неавторизованными.</p>
+ * <p>Анонимные токены считаются неавторизованными.</p>
  */
 
 @Slf4j
@@ -40,6 +40,7 @@ public class AccessServiceImpl implements AccessService {
     }
 
     public void checkAdmin(Authentication authentication) {
+        checkAuth(authentication);
         if (!isAdmin(authentication)) {
             log.warn("Trying non-admin access to admin-only operation! {}", authentication.getName());
             throw new ForbiddenException(AppErrorsMessages.ONLY_ADMIN_ACCESS);

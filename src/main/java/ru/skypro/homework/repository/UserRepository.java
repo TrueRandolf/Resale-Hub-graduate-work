@@ -10,6 +10,7 @@ import java.util.Optional;
  *
  * <p>Обеспечивает поиск и проверку существования пользователей по уникальному имени
  * (логину).</p>
+ * <p>Подсчитывает количество существовующих и удаленных (soft-delete) пользователей.</p>
  */
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
@@ -18,6 +19,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     boolean existsByUserName(String UserName);
 
-    Optional<UserEntity> findById(Long id);
+    long countByDeletedAtIsNull();
+
+    long countByDeletedAtIsNotNull();
 
 }

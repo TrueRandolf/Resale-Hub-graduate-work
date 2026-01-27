@@ -52,7 +52,7 @@ app:
     cache-period: 1800 #seconds (30min)
   security:
     whitelist: /login,/register,/images/**,/swagger-ui/**,/v3/api-docs/**
-    protected-endpoints: "/ads/**,/users/**"
+    protected-endpoints: "/ads/**,/users/**,/management/**"
     allowed-origins: http://localhost:3000,http://localhost:8080
     allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
     allowed-headers: "*"  # Разрешены все заголовки для совместимости с реквестами браузера. Безопасность - ограничения в allowed-origins.
