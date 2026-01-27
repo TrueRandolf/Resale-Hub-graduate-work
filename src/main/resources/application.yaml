@@ -2,6 +2,7 @@
 spring:
   application:
     name: resale-service  # application name
+
   # DB settings
   datasource:
     url: jdbc:postgresql://localhost:5432/resale_db
@@ -29,11 +30,9 @@ spring:
       max-request-size: 15MB
       file-size-threshold: 2KB
 
-# Server port, run by default
 server:
   port: 8080
 
-# Logger settings
 logging:
   level:
     org.hibernate.tool.schema: DEBUG
@@ -48,23 +47,13 @@ app:
     ads-dir: ads_images
     avatars-dir: avatars_images
   images:
+    resource-handler: "/images/**"  # Путь картинок для фронта
     base-url: /images/
     cache-period: 1800 #seconds (30min)
   security:
-    allowed-origins:
-      - "http://localhost:3000"
-      - "http://localhost:8080"
-    whitelist:
-      - "/login"
-      - "/register"
-      - "/images/**"
-      - "/swagger-resources/**"
-      - "/swagger-ui.html"
-      - "/swagger-ui/**"
-      - "/v3/api-docs/**"
-      - "/webjars/**"
-    allowed-headers:
-      - "Authorization"
-      - "Content-Type"
-      - "X-Requested-With"
-
+    whitelist: /login,/register,/images/**,/swagger-ui/**,/v3/api-docs/**
+    protected-endpoints: "/ads/**,/users/**"
+    allowed-origins: http://localhost:3000,http://localhost:8080
+    allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+    allowed-headers: "*"  # Разрешены все заголовки для совместимости с реквестами браузера. Безопасность - ограничения в allowed-origins.
+    cors-mapping: "/**"

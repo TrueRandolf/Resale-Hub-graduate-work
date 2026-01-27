@@ -32,7 +32,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
  *         и Swagger (порт 8080).</li>
  * </ul>
  *
- * <p>CORS настроен для работы браузера с портами 3000 и 8080 (для работы в Docker).</p>
+ * <p>Конфигурация полностью вынесена в параметры приложения (YAML) для
+ * гибкости настройки CORS и прав доступа для различных окружений.</p>
  *
  * @see ru.skypro.homework.config.OpenApiConfig
  * @see ru.skypro.homework.config.WebConfig
@@ -42,25 +43,23 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-//    private static final String[] AUTH_WHITELIST = {
-//            "/swagger-resources/**",
-//            "/swagger-ui.html",
-//            "/swagger-ui/**",
-//            "/v3/api-docs/**",
-//            "/webjars/**",
-//            "/login",
-//            "/register",
-//            "/images/**"
-//    };
+    @Value("${app.security.whitelist}")
+    private String[] authWhitelist;
+
+    @Value("${app.security.protected-endpoints}")
+    private String[] protectedEndpoints;
 
     @Value("${app.security.allowed-origins}")
     private List<String> allowedOrigins;
 
-    @Value("${app.security.whitelist}")
-    private String[] authWhitelist;
+    @Value("${app.security.allowed-methods}")
+    private List<String> allowedMethods;
 
     @Value("${app.security.allowed-headers}")
     private List<String> allowedHeaders;
+
+    @Value("${app.security.cors-mapping}")
+    private String corsMapping;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -68,32 +67,26 @@ public class WebSecurityConfig {
                 .csrf().disable()
                 .cors(withDefaults())
                 .authorizeHttpRequests((authorization) -> authorization
-                        //.mvcMatchers(AUTH_WHITELIST).permitAll()
                         .mvcMatchers(authWhitelist).permitAll()
-                        .mvcMatchers("/ads/**", "/users/**").authenticated()
+                        .mvcMatchers(protectedEndpoints).authenticated()
                 )
                 .httpBasic(withDefaults());
-
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        //configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
         configuration.setAllowedOrigins(allowedOrigins);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        //configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedMethods(allowedMethods);
         configuration.setAllowedHeaders(allowedHeaders);
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration(corsMapping, configuration);
 
         return source;
-
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

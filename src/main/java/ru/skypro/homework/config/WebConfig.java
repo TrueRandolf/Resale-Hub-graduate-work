@@ -25,6 +25,9 @@ import java.nio.file.Paths;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    @Value("${app.images.resource-handler}")
+    private String resourceHandler;
+
     @Value("${app.upload.main-dir}")
     private String mainDir;
 
@@ -36,7 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         String rootPath = Paths.get(mainDir).toAbsolutePath().toUri().toString();
 
-        registry.addResourceHandler("/images/**")
+        registry.addResourceHandler(resourceHandler)
                 .addResourceLocations(rootPath)
                 .setCachePeriod(browserCash);
     }

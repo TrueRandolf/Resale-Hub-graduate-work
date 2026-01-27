@@ -89,8 +89,6 @@ public class CommentsController {
             summary = "Удаление комментария",
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", content = @Content()),
-                    //@ApiResponse(responseCode = "200", description = "OK", content = @Content()),
-                    // Что писать-то??? в ТЗ одно, в схеме другое, скайпро, короче...
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content()),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content()),
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),
