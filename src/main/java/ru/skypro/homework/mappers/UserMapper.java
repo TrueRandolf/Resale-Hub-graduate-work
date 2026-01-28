@@ -1,6 +1,7 @@
 package ru.skypro.homework.mappers;
 
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Value;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.dto.users.UpdateUser;
 import ru.skypro.homework.dto.users.User;
@@ -16,8 +17,9 @@ import ru.skypro.homework.entities.UserEntity;
  */
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface UserMapper {
-
+public abstract class UserMapper {
+    @Value("${app.images.base-url}")
+    protected String baseUrl;
 
     /**
      * Маппинг в DTO пользователя.
@@ -31,24 +33,24 @@ public interface UserMapper {
     @Mapping(target = "phone", source = "userEntity.phone")
     @Mapping(target = "image", source = "userEntity.userImage", qualifiedByName = "userImageToPath")
     @Mapping(target = "role", source = "authEntity.role")
-    User toUserDto(UserEntity userEntity, AuthEntity authEntity);
+    public abstract User toUserDto(UserEntity userEntity, AuthEntity authEntity);
 
     @Named("userImageToPath")
-    default String mapImage(String userImage) {
+    protected String mapImage(String userImage) {
         if (userImage == null) return null;
-        return "/images/" + userImage;
+        return baseUrl + userImage;
     }
 
 
-    void updateUserEntity(UpdateUser dto, @MappingTarget UserEntity entity);
+    public abstract void updateUserEntity(UpdateUser dto, @MappingTarget UserEntity entity);
 
 
-    UpdateUser toDtoUpdateUser(UserEntity entity);
+    public abstract UpdateUser toDtoUpdateUser(UserEntity entity);
 
     @Mapping(target = "userName", source = "username")
-    UserEntity toUserEntity(Register register);
+    public abstract UserEntity toUserEntity(Register register);
 
-    AuthEntity toAuthEntity(Register register);
+    public abstract AuthEntity toAuthEntity(Register register);
 
 
 }

@@ -1,6 +1,10 @@
 package ru.skypro.homework.mappers;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.dto.comments.Comment;
 import ru.skypro.homework.dto.comments.Comments;
 import ru.skypro.homework.dto.comments.CreateOrUpdateComment;
@@ -14,8 +18,16 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest(classes = CommentMapperImpl.class)
+@ActiveProfiles("test")
 public class CommentTests {
-    private final CommentMapper commentMapper = org.mapstruct.factory.Mappers.getMapper(CommentMapper.class);
+
+    @Autowired
+    private CommentMapper commentMapper;
+
+    @Value("${app.images.base-url}")
+    private String testBaseUrl;
+
 
     @Test
     void shouldMapCommentFromCommentEntity() {
@@ -27,8 +39,8 @@ public class CommentTests {
 
         assertThat(comment).isNotNull();
         assertThat(comment.getAuthor().longValue()).isEqualTo(userEntity.getId());
-        assertThat(comment.getAuthorImage()).isEqualTo(userEntity.getUserImage());
-        assertThat(comment.getAuthorFirstname()).isEqualTo(userEntity.getFirstName());
+        assertThat(comment.getAuthorImage()).isEqualTo(testBaseUrl+  userEntity.getUserImage());
+        assertThat(comment.getAuthorFirstName()).isEqualTo(userEntity.getFirstName());
         assertThat(comment.getCreatedAt()).isEqualTo(commentEntity.getCreatedAt());
         assertThat(comment.getPk().longValue()).isEqualTo(commentEntity.getId());
         assertThat(comment.getText()).isEqualTo(commentEntity.getText());

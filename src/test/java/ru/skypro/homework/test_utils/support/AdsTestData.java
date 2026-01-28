@@ -1,4 +1,4 @@
-package ru.skypro.homework.support;
+package ru.skypro.homework.test_utils.support;
 
 import lombok.experimental.UtilityClass;
 import ru.skypro.homework.dto.ads.Ad;

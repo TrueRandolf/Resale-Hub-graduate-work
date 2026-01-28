@@ -103,20 +103,6 @@ public class GlobalControllerAdvice {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-//    /**
-//     * Обрабатывает исключения {@link IllegalArgumentException}, возникающие при вводе некорректных данных.
-//     * Возвращает HTTP статус BAD_REQUEST (400).
-//     *
-//     * @param e Перехваченное исключение.
-//     * @return Ответ с текстом ошибки и кодом статуса 400.
-//     */
-//    @ExceptionHandler(IllegalArgumentException.class)
-//    public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
-//        ErrorDto errorResponse = new ErrorDto(
-//                HttpStatus.BAD_REQUEST.toString(), e.getMessage());
-//        log.error("BAD_REQUEST {}", e.getMessage());
-//        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-//    }
 
     /**
      * Обрабатывает все неучтенные ранее исключения {@link Exception}.

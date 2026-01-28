@@ -185,7 +185,7 @@ public class AdServiceImpl implements AdService {
      *  </ul>
      *  </p>
      * Используется в методе мягкого удаления пользователя
-     * {@link ru.skypro.homework.service.UserService#softDeleteUser(Long, Authentication)}
+     * {@link ru.skypro.homework.service.ManagementService#softDeleteUser(Long, Authentication)}
      */
     @Override
     @Transactional
