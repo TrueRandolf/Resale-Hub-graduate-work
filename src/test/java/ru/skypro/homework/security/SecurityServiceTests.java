@@ -30,9 +30,9 @@ public class SecurityServiceTests {
     @Mock
     private Authentication authentication;
 
-    private final String ADMIN_MAIL ="admin@mail.com";
-    private final String AUTHOR_MAIL ="author@mail.com";
-    private final String OUTSIDER_MAIL ="other@mail.com";
+    private final String ADMIN_MAIL = "admin@mail.com";
+    private final String AUTHOR_MAIL = "author@mail.com";
+    private final String OUTSIDER_MAIL = "other@mail.com";
 
 
     @Test

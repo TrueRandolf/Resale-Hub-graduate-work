@@ -1,5 +1,6 @@
 package ru.skypro.homework.mappers;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ public class UserTests {
     private String testBaseUrl;
 
     @Test
+    @DisplayName("Создание User DTO из сущностей User и Auth")
     void shouldMapUserAndAuthToUserDto() {
         UserEntity userEntity = TestData.createTestUserEntity();
         AuthEntity authEntity = TestData.createTestAuthEntity(userEntity);
@@ -44,6 +46,7 @@ public class UserTests {
 
 
     @Test
+    @DisplayName("Обновление UserEntity из UpdateUser DTO")
     void shouldUpdateUserFields() {
         UserEntity userEntity = TestData.createTestUserEntity();
 
@@ -66,6 +69,7 @@ public class UserTests {
     }
 
     @Test
+    @DisplayName("Запись из Register DTO в сущности User и Auth")
     void shouldWriteRegisterInTwoEntities() {
         Register register = new Register();
         register.setUsername("Login");

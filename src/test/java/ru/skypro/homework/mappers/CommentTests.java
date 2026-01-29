@@ -1,5 +1,6 @@
 package ru.skypro.homework.mappers;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ public class CommentTests {
 
 
     @Test
+    @DisplayName("Маппинг в DTO Comment из CommentEntity")
     void shouldMapCommentFromCommentEntity() {
         UserEntity userEntity = TestData.createTestUserEntity();
         AdEntity adEntity = TestData.createTestAdEntity(userEntity);
@@ -48,6 +50,7 @@ public class CommentTests {
     }
 
     @Test
+    @DisplayName("Обновление из DTO CreateOrUpdateComment в Comment")
     void shouldUpdateCommentText() {
         UserEntity userEntity = TestData.createTestUserEntity();
         AdEntity adEntity = TestData.createTestAdEntity(userEntity);
@@ -65,6 +68,7 @@ public class CommentTests {
     }
 
     @Test
+    @DisplayName("Добавление DTO Comment в DTO Comments")
     void shouldMapCommentsFromListCommentEntities() {
         List<CommentEntity> commentEntities = new ArrayList<>();
         for (int i = 0; i < 5; i++) {

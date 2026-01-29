@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class AuthIntegrationTests{
+public class AuthIntegrationTests {
 
     @Autowired
     private AuthServiceImpl authService;
@@ -49,26 +49,22 @@ public class AuthIntegrationTests{
         register.setPhone("+79991234567");
         register.setRole(Role.USER);
 
-        // 1. Регистрация (пробиваем метод register)
         authService.register(register);
 
-        // Проверяем, что в базе появились обе сущности
         assertThat(userRepository.existsByUserName("newuser@mail.com")).isTrue();
         assertThat(authRepository.findByUser_UserName("newuser@mail.com")).isPresent();
-
-        // 2. Логин (пробиваем метод login - Happy Path)
         assertDoesNotThrow(() -> authService.login("newuser@mail.com", "password123"));
     }
 
     @Test
     @DisplayName("Ошибка регистрации: пользователь уже существует (400)")
     void register_ThrowsBadRequest_WhenUserExists() {
-        // Создаем юзера заранее
+
         UserEntity user = new UserEntity();
         user.setUserName("exists@mail.com");
         user.setFirstName("Ivan");
-        user.setLastName("Ivanov"); // Если NOT NULL
-        user.setPhone("+79991112233"); // Тот самый виновник!
+        user.setLastName("Ivanov");
+        user.setPhone("+79991112233");
         userRepository.save(user);
 
         Register register = new Register();
@@ -79,14 +75,12 @@ public class AuthIntegrationTests{
         register.setPhone("+79991234567");
         register.setRole(Role.USER);
 
-        // Пробиваем ветку throw в методе register
         assertThrows(BadRequestException.class, () -> authService.register(register));
     }
 
     @Test
     @DisplayName("Ошибка логина: неверный пароль (401)")
     void login_ThrowsUnauthorized_WhenPasswordWrong() {
-        // Регистрируем
         Register register = new Register();
         register.setUsername("test@mail.com");
         register.setPassword("secret");
@@ -95,10 +89,7 @@ public class AuthIntegrationTests{
         register.setPhone("+79991234567");
         register.setRole(Role.USER);
 
-
         authService.register(register);
-
-        // Пробиваем orElseThrow в методе login
         assertThrows(UnauthorizedException.class, () -> authService.login("test@mail.com", "wrong_pass"));
     }
 }

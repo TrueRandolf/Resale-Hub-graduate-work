@@ -28,75 +28,75 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-    @AutoConfigureMockMvc
-    @ActiveProfiles("test")
-    @Transactional
-    public class CommentIntegrationTests {
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
+public class CommentIntegrationTests {
 
-        @Autowired
-        private MockMvc mockMvc;
-        @Autowired
-        private CommentRepository commentRepository;
-        @Autowired
-        private AdsRepository adsRepository;
-        @Autowired
-        private UserRepository userRepository;
-        @Autowired
-        private ObjectMapper objectMapper;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private CommentRepository commentRepository;
+    @Autowired
+    private AdsRepository adsRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        private UserEntity author;
-        private AdEntity testAd;
+    private UserEntity author;
+    private AdEntity testAd;
 
-        @BeforeEach
-        void setUp() {
-            commentRepository.deleteAll();
-            adsRepository.deleteAll();
-            userRepository.deleteAll();
+    @BeforeEach
+    void setUp() {
+        commentRepository.deleteAll();
+        adsRepository.deleteAll();
+        userRepository.deleteAll();
 
-            author = new UserEntity();
-            author.setUserName("commentator@mail.com");
-            author.setFirstName("Ivan");
-            author.setLastName("Ivan");
-            author.setPhone("+799912345678");
-            userRepository.save(author);
+        author = new UserEntity();
+        author.setUserName("commentator@mail.com");
+        author.setFirstName("Ivan");
+        author.setLastName("Ivan");
+        author.setPhone("+799912345678");
+        userRepository.save(author);
 
-            testAd = new AdEntity();
-            testAd.setTitle("Ad for comments");
-            testAd.setDescription("Description for ad for comments");
-            testAd.setPrice(100);
-            testAd.setUser(author);
-            adsRepository.save(testAd);
-        }
+        testAd = new AdEntity();
+        testAd.setTitle("Ad for comments");
+        testAd.setDescription("Description for ad for comments");
+        testAd.setPrice(100);
+        testAd.setUser(author);
+        adsRepository.save(testAd);
+    }
 
-        @Test
-        @DisplayName("Интеграционный тест: добавить, получить и удалить комментарий")
-        @WithMockUser(username = "commentator@mail.com")
-        void commentLifecycle_Success() throws Exception {
-            CreateOrUpdateComment createDto = new CreateOrUpdateComment();
-            createDto.setText("Very long and interesting comment");
+    @Test
+    @DisplayName("Интеграционный тест: добавить, получить и удалить комментарий")
+    @WithMockUser(username = "commentator@mail.com")
+    void commentLifecycle_Success() throws Exception {
+        CreateOrUpdateComment createDto = new CreateOrUpdateComment();
+        createDto.setText("Very long and interesting comment");
 
-            String response = mockMvc.perform(post("/ads/{id}/comments", testAd.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDto))
-                            .with(csrf()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.text").value(createDto.getText()))
-                    .andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(post("/ads/{id}/comments", testAd.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createDto))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.text").value(createDto.getText()))
+                .andReturn().getResponse().getContentAsString();
 
-            Comment responseDto = objectMapper.readValue(response, Comment.class);
-            Integer commentId = responseDto.getPk();
+        Comment responseDto = objectMapper.readValue(response, Comment.class);
+        Integer commentId = responseDto.getPk();
 
-            mockMvc.perform(get("/ads/{id}/comments", testAd.getId()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.count").value(1))
-                    .andExpect(jsonPath("$.results[0].pk").value(commentId));
+        mockMvc.perform(get("/ads/{id}/comments", testAd.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(1))
+                .andExpect(jsonPath("$.results[0].pk").value(commentId));
 
-            mockMvc.perform(delete("/ads/{adId}/comments/{commentId}", testAd.getId(), commentId)
-                            .with(csrf()))
-                    .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/ads/{adId}/comments/{commentId}", testAd.getId(), commentId)
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
 
-            assertThat(commentRepository.existsById(commentId.longValue())).isFalse();
-        }
+        assertThat(commentRepository.existsById(commentId.longValue())).isFalse();
+    }
 
 
     @Test
@@ -164,7 +164,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @DisplayName("CommentService: Успешное обновление комментария (200)")
     @WithMockUser(username = "commentator@mail.com")
     void shouldUpdateComment() throws Exception {
-        // 1. Создаем коммент в базе (привязан к автору и testAd)
         CommentEntity comment = new CommentEntity();
         comment.setText("Old Comment Text");
         comment.setUser(author);
@@ -172,11 +171,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         comment.setCreatedAt(System.currentTimeMillis());
         comment = commentRepository.save(comment);
 
-        // 2. Данные для обновления
         CreateOrUpdateComment updateDto = new CreateOrUpdateComment();
-        updateDto.setText("New Updated Comment Text"); // min 8 chars
+        updateDto.setText("New Updated Comment Text");
 
-        // 3. Выполняем PATCH
         mockMvc.perform(patch("/ads/{adId}/comments/{commentId}", testAd.getId(), comment.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto))
@@ -184,10 +181,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.text").value("New Updated Comment Text"));
 
-        // 4. Проверяем в БД
         CommentEntity updated = commentRepository.findById(comment.getId()).orElseThrow();
         assertThat(updated.getText()).isEqualTo("New Updated Comment Text");
     }
 
-    }
+}
 

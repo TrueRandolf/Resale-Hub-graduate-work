@@ -12,33 +12,21 @@ spring:
 
   liquibase:
     enabled: false
-#    change-log: classpath:db/changelog/db.changelog-master.yaml
 
   # Hibernate settings
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: create-drop #validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
-        format_sql: true
+        format_sql: false
 
-
-#  servlet:
-#    multipart:
-#      max-file-size: ${app.upload.max-size}
-#      max-request-size: 15MB
-#      file-size-threshold: 2KB
-#
-#server:
-#  port: 8080
-#
-#logging:
-#  level:
-#    org.hibernate.tool.schema: DEBUG
-#    org.springframework.security: DEBUG
-#
+logging:
+  level:
+    org.hibernate.tool.schema: INFO
+    org.springframework.security: INFO
 
 app:
   upload:
@@ -54,7 +42,3 @@ app:
   security:
     whitelist: /login,/register,/images/**,/swagger-ui/**,/v3/api-docs/**
     protected-endpoints: "/ads/**,/users/**,/management/**"
-#    allowed-origins: http://localhost:3000,http://localhost:8080
-#    allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
-#    allowed-headers: "*"  # Разрешены все заголовки для совместимости с реквестами браузера. Безопасность - ограничения в allowed-origins.
-#    cors-mapping: "/**"

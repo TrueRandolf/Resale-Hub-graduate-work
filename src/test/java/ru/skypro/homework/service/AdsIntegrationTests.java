@@ -9,6 +9,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -301,7 +302,7 @@ public class AdsIntegrationTests {
 
 
     @Test
-    @WithMockUser(username = "commentator@mail.com") // Юзер из твоего setUp
+    @WithMockUser(username = "commentator@mail.com")
     void shouldGetAdsMe() throws Exception {
         mockMvc.perform(get("/ads/me"))
                 .andExpect(status().isOk());
@@ -316,15 +317,13 @@ public class AdsIntegrationTests {
         ad.setUser(testUser);
         adsRepository.save(ad);
 
-        // 1. Создаем "сломанный" файл
         MultipartFile file = org.mockito.Mockito.mock(MultipartFile.class);
-        // 2. Заставляем его взорваться при чтении байтов
+
         org.mockito.Mockito.when(file.getBytes()).thenThrow(new IOException());
         org.mockito.Mockito.when(file.getContentType()).thenReturn("image/png");
         org.mockito.Mockito.when(file.isEmpty()).thenReturn(false);
         org.mockito.Mockito.when(file.getSize()).thenReturn(100L);
 
-        // 3. Вызываем напрямую, чтобы зайти в catch
         assertThrows(RuntimeException.class, () ->
                 adService.updateAdImage(file, ad.getId(), null));
     }
