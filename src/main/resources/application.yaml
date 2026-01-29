@@ -6,8 +6,8 @@ spring:
   # DB settings
   datasource:
     url: jdbc:postgresql://localhost:5432/resale_db
-    username: resale_owner
-    password: ShowMeTheMoney511
+    username: ЛОГИН
+    password: ПАРОЛЬ
     driver-class-name: org.postgresql.Driver
 
   liquibase:
