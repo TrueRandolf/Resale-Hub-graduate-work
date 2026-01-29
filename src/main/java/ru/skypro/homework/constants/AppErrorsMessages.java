@@ -20,6 +20,7 @@ public final class AppErrorsMessages {
     public static final String INVALID_PASSWORD = "Invalid password";
     public static final String AUTH_DATA_NOT_FOUND = "Auth data not found";
 
+
     /**
      * Ошибки поиска сущностей.
      */

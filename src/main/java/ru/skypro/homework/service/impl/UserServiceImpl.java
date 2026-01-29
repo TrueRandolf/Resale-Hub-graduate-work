@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUserPassword(NewPassword newPassword, Authentication authentication) {
-        log.info("invoked user service change password");
+        log.debug("invoked user service change password");
 
         accessService.checkAuth(authentication);
         String login = authentication.getName();
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public User getAuthUserInfo(Authentication authentication) {
-        log.info("invoked user service get info");
+        log.debug("invoked user service get info");
 
         String login = authentication.getName();
         log.info("user login: {}", login);
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UpdateUser updateAuthUser(UpdateUser updateUser, Authentication authentication) {
-        log.info("invoked user service update info");
+        log.debug("invoked user service update info");
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
                 .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateAuthUserImage(MultipartFile file, Authentication authentication) {
-        log.info("invoked user service update image");
+        log.debug("invoked user service update image");
 
         UserEntity userEntity = userRepository.findByUserName(authentication.getName())
                 .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));

@@ -49,7 +49,7 @@ public class AdServiceImpl implements AdService {
     @Override
     @Transactional(readOnly = true)
     public Ads getAds(Authentication authentication) {
-        log.info("invoked ad service getAllAds");
+        log.debug("invoked ad service getAllAds");
         accessService.checkAuth(authentication);
         return mapper.toAds(adsRepository.findAll());
     }
@@ -61,7 +61,7 @@ public class AdServiceImpl implements AdService {
     @Override
     @Transactional
     public Ad addSimpleAd(CreateOrUpdateAd createOrUpdateAd, MultipartFile image, Authentication authentication) {
-        log.info("invoked ad service add ad");
+        log.debug("invoked ad service add ad");
 
         accessService.checkAuth(authentication);
 
@@ -83,7 +83,7 @@ public class AdServiceImpl implements AdService {
     @Override
     @Transactional(readOnly = true)
     public ExtendedAd getAdInfo(Long id, Authentication authentication) {
-        log.info("invoked ad service get ad info");
+        log.debug("invoked ad service get ad info");
 
         accessService.checkAuth(authentication);
 
@@ -100,7 +100,7 @@ public class AdServiceImpl implements AdService {
     @Override
     @Transactional
     public void deleteSimpleAd(Long id, Authentication authentication) {
-        log.info("invoked ad service delete ad");
+        log.debug("invoked ad service delete ad");
 
         accessService.checkAuth(authentication);
         AdEntity adEntity = adsRepository.findById(id)
@@ -112,11 +112,12 @@ public class AdServiceImpl implements AdService {
         if (filePath != null) imageService.deleteImage(filePath);
 
     }
+
     /** {@inheritDoc} */
     @Override
     @Transactional
     public Ad updateSingleAd(Long id, CreateOrUpdateAd ad, Authentication authentication) {
-        log.info("invoked ad service update ad");
+        log.debug("invoked ad service update ad");
 
         accessService.checkAuth(authentication);
 
@@ -135,7 +136,7 @@ public class AdServiceImpl implements AdService {
     @Override
     @Transactional(readOnly = true)
     public Ads getAllAdsAuthUser(Authentication authentication) {
-        log.info("invoked ad service getAllAds user");
+        log.debug("invoked ad service getAllAds user");
         accessService.checkAuth(authentication);
         String login = authentication.getName();
         return mapper.toAds(adsRepository.findByUser_UserNameAndUserDeletedAtIsNull(login));
@@ -149,7 +150,7 @@ public class AdServiceImpl implements AdService {
     @Override
     @Transactional
     public byte[] updateAdImage(MultipartFile file, Long id, Authentication authentication) {
-        log.info("invoked ad service update image");
+        log.debug("invoked ad service update image");
 
         accessService.checkAuth(authentication);
 
@@ -190,6 +191,7 @@ public class AdServiceImpl implements AdService {
     @Override
     @Transactional
     public void deleteAllByUserId(Long userId) {
+        log.warn("invoked service delete ads");
         List<AdEntity> adEntityList = adsRepository.findAllByUser_Id(userId);
         Set<String> imageToDelete = adEntityList.stream()
                 .map(AdEntity::getAdImage)

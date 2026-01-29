@@ -29,5 +29,7 @@ public class OctetStreamJsonConverter extends AbstractJackson2HttpMessageConvert
     }
 
     @Override
-    public boolean canWrite(Class<?> clazz, MediaType mediaType) { return false; }
+    public boolean canWrite(Class<?> clazz, MediaType mediaType) {
+        return false;
+    }
 }

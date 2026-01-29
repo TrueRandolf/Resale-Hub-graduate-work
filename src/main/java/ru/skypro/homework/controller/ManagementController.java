@@ -33,7 +33,7 @@ public class ManagementController {
                                     schema = @Schema(implementation = BusinessMetric.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content()),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content())
-    })
+            })
     public BusinessMetric getMetric(Authentication authentication) {
         return managementService.getBusinessMetric(authentication);
     }

@@ -42,7 +42,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional(readOnly = true)
     public Comments getAllCommentsAd(Long adId, Authentication authentication) {
-        log.info("invoked comment service get all comments");
+        log.debug("invoked comment service get all comments");
 
         accessService.checkAuth(authentication);
 
@@ -60,7 +60,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Comment addCommentToAd(Long adId, CreateOrUpdateComment updateComment, Authentication authentication) {
-        log.info("invoked comment service add comment");
+        log.debug("invoked comment service add comment");
 
         accessService.checkAuth(authentication);
 
@@ -87,7 +87,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(Long adId, Long commentId, Authentication authentication) {
-        log.info("invoked comment service delete comment");
+        log.debug("invoked comment service delete comment");
 
         accessService.checkAuth(authentication);
 
@@ -115,7 +115,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Comment updateComment(Long adId, Long commentId, CreateOrUpdateComment updateComment, Authentication authentication) {
-        log.info("invoked comment service update comment");
+        log.debug("invoked comment service update comment");
 
         accessService.checkAuth(authentication);
 

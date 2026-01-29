@@ -44,10 +44,10 @@ public class AdEntity {
     @Column(name = "ad_image")
     private String adImage;
 
-    @Column(name = "title",nullable = false, length = 64)
+    @Column(name = "title", nullable = false, length = 64)
     private String title;
 
-    @Column(name = "description",nullable = false, length = 64)
+    @Column(name = "description", nullable = false, length = 64)
     private String description;
 
 }

@@ -69,7 +69,7 @@ public class ManagementServiceImpl implements ManagementService {
         UserEntity userToDelete = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(AppErrorsMessages.USER_NOT_FOUND));
 
-        accessService.checkEdit(authentication, userToDelete.getUserName());
+        accessService.checkAdmin(authentication);
         log.warn("Admin {} initiated soft-delete for user id {}", authentication.getName(), id);
 
         checkSelfDeletion(id, authentication.getName());

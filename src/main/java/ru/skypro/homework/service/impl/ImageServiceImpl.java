@@ -88,6 +88,7 @@ public class ImageServiceImpl implements ImageService {
      * <p>Проверяет размер, MIME-тип и выполняет копирование потока байтов на диск.</p>
      */
     private String saveImage(MultipartFile file, Path targetDir, String subDir, Long userId) {
+        log.debug("invoked service save image");
         String contentType = file.getContentType();
         if (file.isEmpty()) {
             log.error("Empty image try to load !");
@@ -131,6 +132,7 @@ public class ImageServiceImpl implements ImageService {
      */
     @Override
     public void deleteImage(String filePath) {
+        log.debug("invoked service delete image");
         log.info("Delete image by path: {}", filePath);
         if (filePath == null || filePath.isEmpty()) {
             return;

@@ -42,18 +42,13 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void login(String userName, String password) {
+        log.debug("invoked service login user");
         authRepository.findByUser_UserName(userName)
-                .filter(a->encoder.matches(password, a.getPassword()))
-                .orElseThrow(()->{
-                    log.warn("Authentication failed for user: {}",userName);
+                .filter(a -> encoder.matches(password, a.getPassword()))
+                .orElseThrow(() -> {
+                    log.warn("Authentication failed for user: {}", userName);
                     return new UnauthorizedException(AppErrorsMessages.INVALID_CREDENTIALS);
                 });
-
-//                .map(a -> encoder.matches(password, a.getPassword()))
-//                .orElse( ()-> { log.warn("Invalid password");
-//                    throw new UnauthorizedException(AppErrorsMessages.INVALID_CREDENTIALS);
-//                });
-
     }
 
     /**
@@ -65,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public void register(Register register) {
+        log.debug("invoked service register new user");
         if (userRepository.existsByUserName(register.getUsername())) {
             log.warn("User already exists");
             throw new BadRequestException(AppErrorsMessages.USER_ALREADY_EXISTS);

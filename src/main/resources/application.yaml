@@ -16,13 +16,13 @@ spring:
 
   # Hibernate settings
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
-        use_sql_comments: true
+        format_sql: false
+        use_sql_comments: false
 
   servlet:
     multipart:
@@ -35,8 +35,8 @@ server:
 
 logging:
   level:
-    org.hibernate.tool.schema: DEBUG
-    org.springframework.security: DEBUG
+    org.hibernate.tool.schema: INFO
+    org.springframework.security: INFO
 
 
 app:
