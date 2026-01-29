@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +18,19 @@ import ru.skypro.homework.service.UserService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для работы с информацией о пользователе.
+ * Обеспечивает CRUD-операции и управление информацией и паролем пользователя.
+ * <p>Доступ к методам редактирования разрешен для:</p>
+ * <ul>
+ *     <li> Автора объявления</li>
+ *     <li> Админа {@link ru.skypro.homework.dto.Role#ADMIN}  </li>
+ * </ul>
+ *
+ * @see ru.skypro.homework.service.UserService
+ */
+
 @Slf4j
-@CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Пользователи")

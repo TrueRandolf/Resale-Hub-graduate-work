@@ -1,0 +1,44 @@
+# SPRING settings
+spring:
+  application:
+    name: resale-service-test
+
+  # DB settings
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+
+  liquibase:
+    enabled: false
+
+  # Hibernate settings
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop #validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+
+logging:
+  level:
+    org.hibernate.tool.schema: INFO
+    org.springframework.security: INFO
+
+app:
+  upload:
+    max-size: 10485760  #byte (10MB)
+    allowed-types: jpg, jpeg, png, webp
+    main-dir: target/test-images # TEST ONLY !
+    ads-dir: ads_images
+    avatars-dir: avatars_images
+  images:
+    resource-handler: "/images/**"  # Путь картинок для фронта
+    base-url: /images/
+
+  security:
+    whitelist: /login,/register,/images/**,/swagger-ui/**,/v3/api-docs/**
+    protected-endpoints: "/ads/**,/users/**,/management/**"

@@ -2,11 +2,12 @@
 spring:
   application:
     name: resale-service  # application name
+
   # DB settings
   datasource:
     url: jdbc:postgresql://localhost:5432/resale_db
-    username: resale_owner
-    password: ShowMeTheMoney511
+    username: ЛОГИН
+    password: ПАРОЛЬ
     driver-class-name: org.postgresql.Driver
 
   liquibase:
@@ -15,35 +16,44 @@ spring:
 
   # Hibernate settings
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
-        use_sql_comments: true
+        format_sql: false
+        use_sql_comments: false
 
   servlet:
     multipart:
-      max-file-size: 10MB
+      max-file-size: ${app.upload.max-size}
       max-request-size: 15MB
       file-size-threshold: 2KB
 
-# Server port, run by default
 server:
   port: 8080
 
-# Logger settings
 logging:
   level:
-    org.hibernate.tool.schema: DEBUG
-    org.springframework.security: DEBUG
+    org.hibernate.tool.schema: INFO
+    org.springframework.security: INFO
 
-# Filepath settings
+
 app:
   upload:
+    max-size: 10485760  #byte (10MB)
+    allowed-types: jpg, jpeg, png, webp
     main-dir: resale_images
     ads-dir: ads_images
     avatars-dir: avatars_images
   images:
+    resource-handler: "/images/**"  # Путь картинок для фронта
     base-url: /images/
+    cache-period: 1800 #seconds (30min)
+  security:
+    whitelist: /login,/register,/images/**,/swagger-ui/**,/v3/api-docs/**
+    protected-endpoints: "/ads/**,/users/**,/management/**"
+    allowed-origins: http://localhost:3000,http://localhost:8080
+    allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+    allowed-headers: "*"  # Разрешены все заголовки для совместимости с реквестами браузера. Безопасность - ограничения в allowed-origins.
+    cors-mapping: "/**"

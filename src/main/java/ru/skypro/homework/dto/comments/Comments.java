@@ -5,6 +5,12 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Обертка списка форм комментариев {@link ru.skypro.homework.dto.comments.Comment} </p>.
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.CommentMapper} </p>
+ */
+
 @Schema(description = "Comments")
 @Data
 public class Comments {

@@ -5,6 +5,13 @@ import lombok.Data;
 
 import javax.validation.constraints.Size;
 
+/**
+ * Данные для аутентификации пользователя.
+ *
+ * <p>Передается в теле запроса при входе в систему.</p>
+ * {@link ru.skypro.homework.controller.AuthController}
+ */
+
 @Data
 @Schema(description = "Login")
 public class Login {

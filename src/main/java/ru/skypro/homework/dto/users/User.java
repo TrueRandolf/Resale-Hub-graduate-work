@@ -3,6 +3,12 @@ package ru.skypro.homework.dto.users;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+/**
+ * ФОрма представления данных пользователя.
+ * <p> Маппинг:
+ * {@link ru.skypro.homework.mappers.UserMapper} </p>
+ */
+
 @Schema(description = "User")
 @Data
 public class User {

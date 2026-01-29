@@ -5,9 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * Класс стандартизированного ответа ошибки в API.
- * Возвращает клиенту информацию об ошибке в стандартизированном виде.
+ * Стандартизированное тело ответа при возникновении ошибки в API.
+ * <p> Формируется и возвращается
+ * {@link ru.skypro.homework.exceptions.GlobalControllerAdvice} </p>
  */
+
 @Getter
 @AllArgsConstructor
 @Builder

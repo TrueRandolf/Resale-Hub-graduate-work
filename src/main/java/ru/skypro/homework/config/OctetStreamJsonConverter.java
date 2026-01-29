@@ -5,6 +5,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 
+/**
+ * Кастомный конвертер для обработки JSON-данных, передаваемых с MIME-типом {@code application/octet-stream}.
+ *
+ * <p>Служит для корректной десериализации JSON-объектов в Multipart-запросах,
+ * в случае прихода части данных в виде потока байтов, а не в {@code application/json}. </p>
+ * <p> Характерно для Swagger или Docker-прокси.</p>
+ *
+ * <p>Работает только на чтение. Запись в формате {@code octet-stream} для данного конвертера отключена.</p>
+ *
+ * @see org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
+ */
+
 @Component
 public class OctetStreamJsonConverter extends AbstractJackson2HttpMessageConverter {
     public OctetStreamJsonConverter(ObjectMapper objectMapper) {
@@ -17,5 +29,7 @@ public class OctetStreamJsonConverter extends AbstractJackson2HttpMessageConvert
     }
 
     @Override
-    public boolean canWrite(Class<?> clazz, MediaType mediaType) { return false; }
+    public boolean canWrite(Class<?> clazz, MediaType mediaType) {
+        return false;
+    }
 }

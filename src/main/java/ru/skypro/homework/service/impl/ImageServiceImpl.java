@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.constants.AppErrorsMessages;
 import ru.skypro.homework.exceptions.BadRequestException;
 import ru.skypro.homework.service.ImageService;
 
@@ -16,12 +17,22 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Реализация сервиса управления файловой системой.
+ *
+ * <p>Отвечает за физическое хранение изображений на диске.
+ * Включает проверку MIME-типов, ограничение размера файлов и
+ * автоматическое создание структуры директорий при запуске.</p>
+ */
+
 @Slf4j
 @Service
 public class ImageServiceImpl implements ImageService {
 
-    private final Set<String> ALLOWED_IMAGETYPES = Set.of("jpg", "jpeg", "png", "webp");
-    private final long MAX_SIZE = 10 * 1024 * 1024;
+    @Value("${app.upload.max-size}")
+    private long maxSize;
+    @Value("${app.upload.allowed-types}")
+    private Set<String> allowedImagesTypes;
 
     @Value("${app.upload.main-dir}")
     private String mainDir;
@@ -33,7 +44,11 @@ public class ImageServiceImpl implements ImageService {
     private Path adsFilePath;
     private Path avatarsFilePath;
 
-
+    /**
+     * Инициализация хранилища.
+     * <p>Создает необходимые папки для объявлений и аватаров, если они отсутствуют.
+     * Использует базовый путь из конфигурации {@code app.upload.main-dir}.</p>
+     */
     @PostConstruct
     private void init() {
         adsFilePath = Path.of(mainDir, adsDir);
@@ -42,39 +57,58 @@ public class ImageServiceImpl implements ImageService {
             log.info("created dir {}", Files.createDirectories(adsFilePath));
             log.info("created dir {}", Files.createDirectories(avatarsFilePath));
         } catch (IOException e) {
-            log.error("Failed to create directory [{},{}] ", adsFilePath, avatarsFilePath, e);
-            throw new UncheckedIOException("Failed to create directory", e);
+            log.error("Failed to create directory [{},{}]", adsFilePath, avatarsFilePath, e);
+            throw new UncheckedIOException(AppErrorsMessages.FILE_STORAGE_ERROR, e);
         }
     }
 
-
+    /**
+     * {@inheritDoc}
+     * <p>Генерирует уникальное имя файла изображения с использованием {@link UUID}
+     * для предотвращения коллизий. </p>
+     */
+    @Override
     public String saveAdImage(MultipartFile file, Long userId) {
         return saveImage(file, adsFilePath, adsDir, userId);
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>Генерирует уникальное имя файла аватара пользователя с использованием {@link UUID}
+     * для предотвращения коллизий. </p>
+     */
+    @Override
     public String saveAvatarImage(MultipartFile file, Long userId) {
         return saveImage(file, avatarsFilePath, avatarsDir, userId);
     }
 
+    /**
+     * Внутренний метод для сохранения файлов.
+     * <p>Проверяет размер, MIME-тип и выполняет копирование потока байтов на диск.</p>
+     */
     private String saveImage(MultipartFile file, Path targetDir, String subDir, Long userId) {
+        log.debug("invoked service save image");
         String contentType = file.getContentType();
         if (file.isEmpty()) {
             log.error("Empty image try to load !");
-            throw new BadRequestException("Incorrect file");
+            throw new BadRequestException(AppErrorsMessages.UNSUPPORTED_FILE_TYPE);
         }
 
-        if (file.getSize() > MAX_SIZE) {
+        if (file.getSize() > maxSize) {
             log.error("File too big!");
-            throw new BadRequestException("File too big");
+            throw new BadRequestException(AppErrorsMessages.FILE_TOO_BIG);
         }
 
         if (contentType == null) {
-            throw new BadRequestException("Unknown file type");
+            log.error("Unknown file type");
+            throw new BadRequestException(AppErrorsMessages.UNSUPPORTED_FILE_TYPE);
         }
 
         String extension = contentType.substring(contentType.lastIndexOf("/") + 1).toLowerCase();
-        if (!ALLOWED_IMAGETYPES.contains(extension)) {
-            throw new BadRequestException("Unsupported file type");
+        if (!allowedImagesTypes.contains(extension)) {
+            log.error("Unsupported file type");
+            throw new BadRequestException(AppErrorsMessages.UNSUPPORTED_FILE_TYPE);
         }
 
         String fileName = String.format("%s_%s.%s", userId, UUID.randomUUID(), extension);
@@ -84,14 +118,21 @@ public class ImageServiceImpl implements ImageService {
         try (InputStream is = file.getInputStream()) {
             Files.copy(is, filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            log.error("File save error {} ", filePath, e);
-            throw new UncheckedIOException("Fail save file", e);
+            log.error("File save error {}", filePath, e);
+            throw new UncheckedIOException(AppErrorsMessages.FILE_STORAGE_ERROR, e);
         }
         log.info("Save image path successfully: {}", filePath);
         return subDir + "/" + fileName;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>Выполняет физическое удаление файла с диска.
+     * Если файл отсутствует, операция завершается без исключения с логированием предупреждения.</p>
+     */
+    @Override
     public void deleteImage(String filePath) {
+        log.debug("invoked service delete image");
         log.info("Delete image by path: {}", filePath);
         if (filePath == null || filePath.isEmpty()) {
             return;
@@ -105,7 +146,7 @@ public class ImageServiceImpl implements ImageService {
             }
         } catch (IOException e) {
             log.error("Error file delete! {}", filePath, e);
-            throw new UncheckedIOException("Error disk file delete", e);
+            throw new UncheckedIOException(AppErrorsMessages.FILE_NOT_FOUND, e);
         }
     }
 

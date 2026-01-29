@@ -17,8 +17,19 @@ import ru.skypro.homework.service.CommentService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для работы с комментариями к объявлениям пользователей.
+ * Обеспечивает CRUD-операции и управление статусами публикаций.
+ * <p>Доступ к методам редактирования разрешен для:</p>
+ * <ul>
+ *     <li> Автора объявления</li>
+ *     <li> Админа {@link ru.skypro.homework.dto.Role#ADMIN}  </li>
+ * </ul>
+ *
+ * @see ru.skypro.homework.service.CommentService
+ */
+
 @Slf4j
-@CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Комментарии")
@@ -78,8 +89,6 @@ public class CommentsController {
             summary = "Удаление комментария",
             responses = {
                     @ApiResponse(responseCode = "204", description = "No content", content = @Content()),
-                    //@ApiResponse(responseCode = "200", description = "OK", content = @Content()),
-                    // Что писать-то??? в ТЗ одно, в схеме другое, скайпро, короче...
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content()),
                     @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content()),
                     @ApiResponse(responseCode = "404", description = "Not Found", content = @Content()),

@@ -1,6 +1,11 @@
 package ru.skypro.homework.mappers;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.users.UpdateUser;
@@ -11,10 +16,19 @@ import ru.skypro.homework.test_utils.TestData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest(classes = UserMapperImpl.class)
+@ActiveProfiles("test")
 public class UserTests {
-    private final UserMapper userMapper = org.mapstruct.factory.Mappers.getMapper(UserMapper.class);
+
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Value("${app.images.base-url}")
+    private String testBaseUrl;
 
     @Test
+    @DisplayName("Создание User DTO из сущностей User и Auth")
     void shouldMapUserAndAuthToUserDto() {
         UserEntity userEntity = TestData.createTestUserEntity();
         AuthEntity authEntity = TestData.createTestAuthEntity(userEntity);
@@ -25,13 +39,14 @@ public class UserTests {
         assertThat(user.getId()).isEqualTo(userEntity.getId().intValue());
         assertThat(user.getEmail()).isEqualTo(userEntity.getUserName());
         assertThat(user.getRole()).isEqualTo(authEntity.getRole().name());
-        assertThat(user.getImage()).isEqualTo(userEntity.getUserImage());
+        assertThat(user.getImage()).isEqualTo(testBaseUrl + userEntity.getUserImage());
         assertThat(user.getFirstName()).isEqualTo(userEntity.getFirstName());
         assertThat(user.getPhone()).isEqualTo(userEntity.getPhone());
     }
 
 
     @Test
+    @DisplayName("Обновление UserEntity из UpdateUser DTO")
     void shouldUpdateUserFields() {
         UserEntity userEntity = TestData.createTestUserEntity();
 
@@ -54,6 +69,7 @@ public class UserTests {
     }
 
     @Test
+    @DisplayName("Запись из Register DTO в сущности User и Auth")
     void shouldWriteRegisterInTwoEntities() {
         Register register = new Register();
         register.setUsername("Login");
