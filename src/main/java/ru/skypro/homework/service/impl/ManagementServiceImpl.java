@@ -113,6 +113,9 @@ public class ManagementServiceImpl implements ManagementService {
                 .collect(Collectors.toSet());
         if (userEntity.getUserImage() != null && !userEntity.getUserImage().isBlank())
             imageToDelete.add(userEntity.getUserImage());
+        if (authRepository.existsById(userEntity.getId())) {
+            authRepository.deleteById(userEntity.getId());
+        }
         userRepository.delete(userEntity);
 
         imageToDelete.forEach(path -> {
